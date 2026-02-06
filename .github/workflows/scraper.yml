@@ -1,0 +1,37 @@
+# GitHub Actions ile periyodik scraping
+# Her gun saat 06:00 ve 18:00 (UTC)'de calisir
+
+name: Update Contact Info
+
+on:
+  schedule:
+    - cron: '0 6,18 * * *'  # Her gun 06:00 ve 18:00 UTC
+  workflow_dispatch: # Manuel tetikleme
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install scraper dependencies
+        run: npm install cheerio axios dotenv
+
+      - name: Run scraper
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: npx ts-node scripts/scraper.ts
+
+      - name: Report status
+        if: failure()
+        run: echo "Scraper failed at $(date)"
