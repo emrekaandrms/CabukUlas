@@ -1,22 +1,25 @@
 export const Colors = {
-  primary: "#1a73e8",
-  primaryDark: "#1967d2",
-  primaryLight: "#e8f0fe",
-  fastest: "#0d9488",
-  fastestLight: "#ccfbf1",
-  background: "#f8fafc",
-  backgroundDark: "#0f172a",
-  surface: "#ffffff",
-  surfaceDark: "#1e293b",
-  text: "#0f172a",
-  textDark: "#f1f5f9",
-  textSecondary: "#64748b",
-  textSecondaryDark: "#94a3b8",
-  border: "#e2e8f0",
-  borderDark: "#334155",
-  danger: "#ef4444",
-  success: "#22c55e",
-  warning: "#f59e0b",
+  // Warm neutral palette - minimal & professional
+  accent: "#FF6B35",       // Warm coral - CTA & fastest
+  accentLight: "#FFF0EB",  // Very light coral
+  background: "#F5F5F0",   // Warm off-white
+  surface: "#FFFFFF",      // Cards
+  text: "#1A1A1A",         // Near-black
+  textSecondary: "#8E8E93", // iOS-like gray
+  textTertiary: "#AEAEB2",  // Lighter gray
+  border: "#E8E8E3",        // Warm light gray
+  borderLight: "#F0F0EB",   // Lighter border
+  success: "#34C759",       // Open status
+  danger: "#FF3B30",        // Closed/error
+  warning: "#FF9500",       // Warning
+
+  // Channel-specific (muted)
+  phone: "#1A1A1A",
+  whatsapp: "#25D366",
+  twitter: "#1A1A1A",
+  email: "#1A1A1A",
+  liveChat: "#FF6B35",
+  sikayetvar: "#E74C3C",
 };
 
 export const Spacing = {
@@ -29,11 +32,11 @@ export const Spacing = {
 };
 
 export const FontSize = {
-  xs: 12,
-  sm: 14,
-  md: 16,
-  lg: 18,
-  xl: 22,
+  xs: 11,
+  sm: 13,
+  md: 15,
+  lg: 17,
+  xl: 20,
   xxl: 28,
   hero: 34,
 };

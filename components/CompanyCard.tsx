@@ -3,9 +3,8 @@ import { View, Text, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Company } from "@/lib/types";
-import { getChannelIcon, getChannelLabel } from "@/lib/utils";
+import { getChannelLabel } from "@/lib/utils";
 import FastestBadge from "./FastestBadge";
-import { Colors } from "@/constants/theme";
 
 interface CompanyCardProps {
   company: Company;
@@ -17,60 +16,73 @@ export default function CompanyCard({ company }: CompanyCardProps) {
 
   return (
     <TouchableOpacity
-      className="bg-white dark:bg-slate-800 rounded-2xl p-4 mx-4 mb-3 shadow-sm border border-slate-100 dark:border-slate-700"
-      activeOpacity={0.7}
+      style={{
+        backgroundColor: "#FFFFFF",
+        borderRadius: 16,
+        padding: 16,
+        marginHorizontal: 16,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: "#F0F0EB",
+      }}
+      activeOpacity={0.6}
       onPress={() => router.push(`/company/${company.slug}`)}
     >
-      <View className="flex-row items-center">
-        {/* Firma logosu */}
-        <View className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-700 items-center justify-center overflow-hidden">
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        {/* Logo */}
+        <View style={{
+          width: 44,
+          height: 44,
+          borderRadius: 12,
+          backgroundColor: "#F5F5F0",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden",
+        }}>
           {company.logo_url ? (
-            <Image
-              source={{ uri: company.logo_url }}
-              className="w-12 h-12"
-              resizeMode="contain"
-            />
+            <Image source={{ uri: company.logo_url }} style={{ width: 44, height: 44 }} resizeMode="contain" />
           ) : (
-            <Text className="text-lg font-bold text-primary-500">
+            <Text style={{ fontSize: 18, fontWeight: "700", color: "#1A1A1A" }}>
               {company.name.charAt(0)}
             </Text>
           )}
         </View>
 
-        {/* Firma bilgileri */}
-        <View className="flex-1 ml-3">
-          <Text className="text-base font-semibold text-slate-900 dark:text-slate-100">
-            {company.name}
-          </Text>
-          <Text className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+        {/* Info */}
+        <View style={{ flex: 1, marginLeft: 12 }}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={{ fontSize: 15, fontWeight: "600", color: "#1A1A1A" }} numberOfLines={1}>
+              {company.name}
+            </Text>
+            {fastestChannel && (
+              <View style={{ marginLeft: 8 }}>
+                <FastestBadge small />
+              </View>
+            )}
+          </View>
+          <Text style={{ fontSize: 12, color: "#8E8E93", marginTop: 2 }}>
             {company.category?.name || ""}
           </Text>
         </View>
 
-        {/* En hizli kanal gostergesi */}
-        <View className="items-end">
-          {fastestChannel && <FastestBadge small />}
-          <Ionicons
-            name="chevron-forward"
-            size={18}
-            color={Colors.textSecondary}
-            style={{ marginTop: 4 }}
-          />
-        </View>
+        {/* Arrow */}
+        <Ionicons name="chevron-forward" size={18} color="#AEAEB2" />
       </View>
 
-      {/* En hizli kanal bilgisi */}
+      {/* Fastest channel hint */}
       {fastestChannel && (
-        <View className="flex-row items-center mt-3 pt-3 border-t border-slate-100 dark:border-slate-700">
-          <Ionicons name="flash" size={14} color="#0d9488" />
-          <Text className="text-xs text-teal-700 dark:text-teal-400 ml-1 font-medium">
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          marginTop: 12,
+          paddingTop: 12,
+          borderTopWidth: 1,
+          borderTopColor: "#F0F0EB",
+        }}>
+          <Ionicons name="flash" size={13} color="#FF6B35" />
+          <Text style={{ fontSize: 12, color: "#FF6B35", fontWeight: "600", marginLeft: 4 }}>
             {getChannelLabel(fastestChannel.channel_type)} ile ulaş
           </Text>
-          {fastestChannel.channel_type === "phone" && (
-            <Text className="text-xs text-slate-400 ml-1">
-              • {fastestChannel.value}
-            </Text>
-          )}
         </View>
       )}
     </TouchableOpacity>

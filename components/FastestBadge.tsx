@@ -9,19 +9,19 @@ interface FastestBadgeProps {
 export default function FastestBadge({ small = false }: FastestBadgeProps) {
   if (small) {
     return (
-      <View className="flex-row items-center bg-teal-50 dark:bg-teal-900/30 px-2 py-0.5 rounded-full">
-        <Ionicons name="flash" size={10} color="#0d9488" />
-        <Text className="text-[10px] font-semibold text-teal-700 dark:text-teal-400 ml-0.5">
-          En Hızlı
+      <View className="flex-row items-center bg-accent-light px-2 py-0.5 rounded-full">
+        <Ionicons name="flash" size={9} color="#FF6B35" />
+        <Text style={{ color: "#FF6B35", fontSize: 10, fontWeight: "700", marginLeft: 2 }}>
+          Hızlı
         </Text>
       </View>
     );
   }
 
   return (
-    <View className="flex-row items-center bg-teal-50 dark:bg-teal-900/30 px-3 py-1.5 rounded-full">
-      <Ionicons name="flash" size={14} color="#0d9488" />
-      <Text className="text-xs font-bold text-teal-700 dark:text-teal-400 ml-1">
+    <View className="flex-row items-center" style={{ backgroundColor: "#FFF0EB" , paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20 }}>
+      <Ionicons name="flash" size={13} color="#FF6B35" />
+      <Text style={{ color: "#FF6B35", fontSize: 12, fontWeight: "700", marginLeft: 3 }}>
         En Hızlı Yol
       </Text>
     </View>

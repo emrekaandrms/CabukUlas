@@ -1,9 +1,8 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { ContactChannel } from "@/lib/types";
-import { getChannelIcon, getChannelLabel, getChannelColor, openChannel } from "@/lib/utils";
-import FastestBadge from "./FastestBadge";
+import { getChannelIcon, getChannelLabel, getChannelActionColor, getChannelActionIcon, openChannel } from "@/lib/utils";
 import WorkingHoursIndicator from "./WorkingHoursIndicator";
 
 interface ContactChannelItemProps {
@@ -12,48 +11,62 @@ interface ContactChannelItemProps {
 
 export default function ContactChannelItem({ channel }: ContactChannelItemProps) {
   const iconName = getChannelIcon(channel.channel_type);
-  const color = getChannelColor(channel.channel_type);
+  const actionColor = getChannelActionColor(channel.channel_type);
+  const actionIcon = getChannelActionIcon(channel.channel_type);
   const label = channel.label || getChannelLabel(channel.channel_type);
 
   const handlePress = () => {
     openChannel(channel.channel_type, channel.value);
   };
 
+  const isFastest = channel.is_fastest;
+
   return (
     <TouchableOpacity
-      className={`flex-row items-center p-4 rounded-2xl mb-3 ${
-        channel.is_fastest
-          ? "bg-teal-50 dark:bg-teal-900/20 border-2 border-teal-200 dark:border-teal-800"
-          : "bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700"
-      }`}
-      activeOpacity={0.6}
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        padding: 14,
+        borderRadius: 14,
+        marginBottom: 8,
+        backgroundColor: isFastest ? "#FFF7F3" : "#FFFFFF",
+        borderWidth: isFastest ? 1.5 : 1,
+        borderColor: isFastest ? "#FFD4C0" : "#F0F0EB",
+      }}
+      activeOpacity={0.5}
       onPress={handlePress}
     >
-      {/* Kanal ikonu */}
-      <View
-        className="w-11 h-11 rounded-xl items-center justify-center"
-        style={{ backgroundColor: `${color}15` }}
-      >
-        <MaterialCommunityIcons
-          name={iconName as any}
-          size={22}
-          color={color}
-        />
+      {/* Channel icon */}
+      <View style={{
+        width: 40,
+        height: 40,
+        borderRadius: 10,
+        backgroundColor: isFastest ? "#FFF0EB" : "#F5F5F0",
+        alignItems: "center",
+        justifyContent: "center",
+      }}>
+        <Ionicons name={iconName as any} size={20} color={isFastest ? "#FF6B35" : "#48484A"} />
       </View>
 
-      {/* Kanal bilgisi */}
-      <View className="flex-1 ml-3">
-        <View className="flex-row items-center">
-          <Text className="text-base font-semibold text-slate-900 dark:text-slate-100">
+      {/* Channel info */}
+      <View style={{ flex: 1, marginLeft: 12 }}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={{ fontSize: 14, fontWeight: "600", color: "#1A1A1A" }}>
             {label}
           </Text>
-          {channel.is_fastest && (
-            <View className="ml-2">
-              <FastestBadge small />
+          {isFastest && (
+            <View style={{
+              marginLeft: 6,
+              backgroundColor: "#FFF0EB",
+              paddingHorizontal: 6,
+              paddingVertical: 1,
+              borderRadius: 8,
+            }}>
+              <Text style={{ fontSize: 9, fontWeight: "700", color: "#FF6B35" }}>EN HIZLI</Text>
             </View>
           )}
         </View>
-        <Text className="text-sm text-slate-500 dark:text-slate-400 mt-0.5" numberOfLines={1}>
+        <Text style={{ fontSize: 12, color: "#8E8E93", marginTop: 2 }} numberOfLines={1}>
           {channel.value}
         </Text>
         {channel.working_hours && (
@@ -61,18 +74,22 @@ export default function ContactChannelItem({ channel }: ContactChannelItemProps)
         )}
       </View>
 
-      {/* Aksiyon ikonu */}
-      <View className="ml-2">
-        {channel.channel_type === "phone" ? (
-          <View className="w-10 h-10 rounded-full bg-primary-500 items-center justify-center">
-            <Ionicons name="call" size={18} color="#fff" />
-          </View>
-        ) : (
-          <View className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 items-center justify-center">
-            <Ionicons name="open-outline" size={18} color="#64748b" />
-          </View>
-        )}
-      </View>
+      {/* Action button */}
+      <TouchableOpacity
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: 20,
+          backgroundColor: actionColor,
+          alignItems: "center",
+          justifyContent: "center",
+          marginLeft: 8,
+        }}
+        activeOpacity={0.7}
+        onPress={handlePress}
+      >
+        <Ionicons name={actionIcon as any} size={18} color="#FFFFFF" />
+      </TouchableOpacity>
     </TouchableOpacity>
   );
 }

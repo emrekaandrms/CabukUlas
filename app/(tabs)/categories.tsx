@@ -1,80 +1,69 @@
 import React from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useCategories } from "@/hooks/useCategories";
 import { getCategoryIcon } from "@/lib/utils";
-import { Colors } from "@/constants/theme";
-
-const categoryColors: Record<string, string> = {
-  "e-ticaret": "#ea580c",
-  kargo: "#d97706",
-  banka: "#2563eb",
-  telekom: "#7c3aed",
-  dijital: "#0891b2",
-  sigorta: "#16a34a",
-  enerji: "#ca8a04",
-  ulasim: "#e11d48",
-};
 
 export default function CategoriesScreen() {
   const router = useRouter();
   const { data: categories, isLoading } = useCategories();
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-900" edges={["top"]}>
-      {/* Header */}
-      <View className="px-5 pt-4 pb-4">
-        <Text className="text-2xl font-bold text-slate-900 dark:text-white">
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F5F0" }} edges={["top"]}>
+      <View style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 16 }}>
+        <Text style={{ fontSize: 28, fontWeight: "800", color: "#1A1A1A", letterSpacing: -0.5 }}>
           Kategoriler
         </Text>
-        <Text className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Sektöre göre firmaları keşfet
+        <Text style={{ fontSize: 14, color: "#8E8E93", marginTop: 2 }}>
+          Sektöre göre firmalar
         </Text>
       </View>
 
       {isLoading ? (
-        <ActivityIndicator size="large" color={Colors.primary} className="mt-12" />
+        <ActivityIndicator size="large" color="#1A1A1A" style={{ marginTop: 48 }} />
       ) : (
-        <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
+        <ScrollView style={{ flex: 1, paddingHorizontal: 16 }} showsVerticalScrollIndicator={false}>
           {categories?.map((category) => {
             const iconName = getCategoryIcon(category.icon);
-            const color = categoryColors[category.icon] || Colors.primary;
 
             return (
               <TouchableOpacity
                 key={category.id}
-                className="flex-row items-center bg-white dark:bg-slate-800 rounded-2xl p-4 mb-3 border border-slate-100 dark:border-slate-700"
-                activeOpacity={0.7}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: 16,
+                  padding: 16,
+                  marginBottom: 8,
+                  borderWidth: 1,
+                  borderColor: "#F0F0EB",
+                }}
+                activeOpacity={0.6}
                 onPress={() =>
-                  router.push(
-                    `/category/${category.id}?name=${encodeURIComponent(category.name)}`
-                  )
+                  router.push(`/category/${category.id}?name=${encodeURIComponent(category.name)}`)
                 }
               >
-                <View
-                  className="w-14 h-14 rounded-xl items-center justify-center"
-                  style={{ backgroundColor: `${color}15` }}
-                >
-                  <Ionicons name={iconName as any} size={28} color={color} />
+                <View style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 14,
+                  backgroundColor: "#F5F5F0",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}>
+                  <Ionicons name={iconName as any} size={24} color="#1A1A1A" />
                 </View>
-                <View className="flex-1 ml-4">
-                  <Text className="text-base font-semibold text-slate-900 dark:text-white">
-                    {category.name}
-                  </Text>
-                </View>
-                <Ionicons name="chevron-forward" size={20} color={Colors.textSecondary} />
+                <Text style={{ flex: 1, fontSize: 16, fontWeight: "600", color: "#1A1A1A", marginLeft: 14 }}>
+                  {category.name}
+                </Text>
+                <Ionicons name="chevron-forward" size={18} color="#AEAEB2" />
               </TouchableOpacity>
             );
           })}
-          <View className="h-6" />
+          <View style={{ height: 24 }} />
         </ScrollView>
       )}
     </SafeAreaView>

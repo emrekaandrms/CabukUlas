@@ -1,56 +1,76 @@
-import { Linking, Platform } from "react-native";
+import { Linking } from "react-native";
 import { ChannelType, WorkingHours } from "./types";
 
 /**
- * Kanal tipine gore ikon ismi dondurur (MaterialCommunityIcons)
+ * Kanal tipine gore Ionicons ikon ismi
  */
 export function getChannelIcon(type: ChannelType): string {
   const icons: Record<ChannelType, string> = {
-    phone: "phone",
-    live_chat: "chat-processing",
-    email: "email-outline",
-    twitter: "twitter",
-    whatsapp: "whatsapp",
-    instagram: "instagram",
-    app: "cellphone",
+    phone: "call-outline",
+    live_chat: "chatbubble-ellipses-outline",
+    email: "mail-outline",
+    twitter: "logo-twitter",
+    whatsapp: "logo-whatsapp",
+    instagram: "logo-instagram",
+    app: "phone-portrait-outline",
+    sikayetvar: "megaphone-outline",
   };
   return icons[type] || "help-circle-outline";
 }
 
 /**
- * Kanal tipine gore Turkce etiket dondurur
+ * Kanal tipine gore Turkce etiket
  */
 export function getChannelLabel(type: ChannelType): string {
   const labels: Record<ChannelType, string> = {
     phone: "Telefon",
-    live_chat: "Canli Destek",
+    live_chat: "Canlı Destek",
     email: "E-posta",
-    twitter: "Twitter/X",
+    twitter: "X (Twitter)",
     whatsapp: "WhatsApp",
     instagram: "Instagram",
     app: "Uygulama",
+    sikayetvar: "Şikayetvar",
   };
   return labels[type] || type;
 }
 
 /**
- * Kanal tipine gore renk dondurur
+ * Kanal tipine gore aksiyon butonu rengi
  */
-export function getChannelColor(type: ChannelType): string {
+export function getChannelActionColor(type: ChannelType): string {
   const colors: Record<ChannelType, string> = {
-    phone: "#1a73e8",
-    live_chat: "#0d9488",
-    email: "#ea580c",
-    twitter: "#1d9bf0",
-    whatsapp: "#25d366",
-    instagram: "#e1306c",
-    app: "#7c3aed",
+    phone: "#1A1A1A",
+    live_chat: "#FF6B35",
+    email: "#1A1A1A",
+    twitter: "#1A1A1A",
+    whatsapp: "#25D366",
+    instagram: "#E1306C",
+    app: "#1A1A1A",
+    sikayetvar: "#E74C3C",
   };
-  return colors[type] || "#6b7280";
+  return colors[type] || "#1A1A1A";
 }
 
 /**
- * Kanala tiklandiginda ilgili aksiyonu baslat
+ * Kanal tipine gore aksiyon ikonu
+ */
+export function getChannelActionIcon(type: ChannelType): string {
+  switch (type) {
+    case "phone": return "call";
+    case "whatsapp": return "logo-whatsapp";
+    case "email": return "mail";
+    case "live_chat": return "chatbubble-ellipses";
+    case "twitter": return "open-outline";
+    case "instagram": return "open-outline";
+    case "app": return "open-outline";
+    case "sikayetvar": return "open-outline";
+    default: return "open-outline";
+  }
+}
+
+/**
+ * Kanala tiklandiginda aksiyonu baslat
  */
 export async function openChannel(type: ChannelType, value: string): Promise<void> {
   let url = "";
@@ -63,7 +83,6 @@ export async function openChannel(type: ChannelType, value: string): Promise<voi
       url = `mailto:${value}`;
       break;
     case "whatsapp":
-      // Numara veya link olabilir
       if (value.startsWith("http")) {
         url = value;
       } else {
@@ -75,6 +94,7 @@ export async function openChannel(type: ChannelType, value: string): Promise<voi
     case "instagram":
     case "live_chat":
     case "app":
+    case "sikayetvar":
       url = value;
       break;
     default:
@@ -85,11 +105,8 @@ export async function openChannel(type: ChannelType, value: string): Promise<voi
     const canOpen = await Linking.canOpenURL(url);
     if (canOpen) {
       await Linking.openURL(url);
-    } else {
-      // Fallback: tarayicide ac
-      if (value.startsWith("http")) {
-        await Linking.openURL(value);
-      }
+    } else if (value.startsWith("http")) {
+      await Linking.openURL(value);
     }
   } catch (error) {
     console.error("Kanal acilamadi:", error);
@@ -97,13 +114,13 @@ export async function openChannel(type: ChannelType, value: string): Promise<voi
 }
 
 /**
- * Calisma saatlerine gore su an acik mi kontrol et
+ * Calisma saatlerine gore su an acik mi
  */
 export function isCurrentlyOpen(workingHours: WorkingHours | null): boolean | null {
   if (!workingHours) return null;
 
   const now = new Date();
-  const day = now.getDay(); // 0=Pazar, 6=Cumartesi
+  const day = now.getDay();
   const isWeekend = day === 0 || day === 6;
 
   const hoursStr = isWeekend ? workingHours.weekend : workingHours.weekdays;
@@ -124,7 +141,7 @@ export function isCurrentlyOpen(workingHours: WorkingHours | null): boolean | nu
 }
 
 /**
- * Turkce karakterleri normalize et (arama icin)
+ * Turkce normalize
  */
 export function normalizeText(text: string): string {
   return text
@@ -143,14 +160,14 @@ export function normalizeText(text: string): string {
  */
 export function getCategoryIcon(iconName: string): string {
   const iconMap: Record<string, string> = {
-    "e-ticaret": "cart-outline",
+    "e-ticaret": "bag-handle-outline",
     kargo: "cube-outline",
-    banka: "card-outline",
-    telekom: "call-outline",
-    dijital: "globe-outline",
+    banka: "wallet-outline",
+    telekom: "wifi-outline",
+    dijital: "tv-outline",
     sigorta: "shield-checkmark-outline",
     enerji: "flash-outline",
-    ulasim: "bus-outline",
+    ulasim: "airplane-outline",
   };
   return iconMap[iconName] || "business-outline";
 }

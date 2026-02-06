@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Linking } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Colors } from "@/constants/theme";
 
 interface CargoTrackerProps {
   companyName: string;
-  trackingUrl: string; // URL sablonu, {code} placeholder icermeli
+  trackingUrl: string;
 }
 
 export default function CargoTracker({ companyName, trackingUrl }: CargoTrackerProps) {
@@ -18,43 +17,60 @@ export default function CargoTracker({ companyName, trackingUrl }: CargoTrackerP
   };
 
   return (
-    <View className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-4 mx-4 mt-4 border border-amber-200 dark:border-amber-800">
-      <View className="flex-row items-center mb-3">
-        <Ionicons name="cube-outline" size={20} color="#d97706" />
-        <Text className="text-sm font-bold text-amber-800 dark:text-amber-300 ml-2">
+    <View style={{
+      backgroundColor: "#FFFFFF",
+      borderRadius: 16,
+      padding: 16,
+      marginHorizontal: 16,
+      marginTop: 16,
+      borderWidth: 1,
+      borderColor: "#F0F0EB",
+    }}>
+      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+        <Ionicons name="cube-outline" size={18} color="#1A1A1A" />
+        <Text style={{ fontSize: 14, fontWeight: "600", color: "#1A1A1A", marginLeft: 8 }}>
           Kargo Takip
         </Text>
       </View>
 
-      <Text className="text-xs text-amber-700 dark:text-amber-400 mb-3">
-        {companyName} kargonuzu resmi siteden takip edin
+      <Text style={{ fontSize: 12, color: "#8E8E93", marginBottom: 12 }}>
+        {companyName} resmi sitesinden takip edin
       </Text>
 
-      <View className="flex-row">
+      <View style={{ flexDirection: "row" }}>
         <TextInput
-          className="flex-1 bg-white dark:bg-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 border border-amber-200 dark:border-slate-600"
+          style={{
+            flex: 1,
+            backgroundColor: "#F5F5F0",
+            borderRadius: 12,
+            paddingHorizontal: 14,
+            paddingVertical: 12,
+            fontSize: 14,
+            color: "#1A1A1A",
+          }}
           value={trackingCode}
           onChangeText={setTrackingCode}
-          placeholder="Takip numaranız..."
-          placeholderTextColor={Colors.textSecondary}
+          placeholder="Takip numarası..."
+          placeholderTextColor="#AEAEB2"
           autoCapitalize="characters"
           returnKeyType="go"
           onSubmitEditing={handleTrack}
         />
         <TouchableOpacity
-          className={`ml-2 rounded-xl px-5 items-center justify-center ${
-            trackingCode.trim() ? "bg-amber-500" : "bg-amber-300"
-          }`}
+          style={{
+            marginLeft: 8,
+            borderRadius: 12,
+            paddingHorizontal: 18,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: trackingCode.trim() ? "#1A1A1A" : "#E8E8E3",
+          }}
           onPress={handleTrack}
           disabled={!trackingCode.trim()}
         >
-          <Ionicons name="arrow-forward" size={20} color="#fff" />
+          <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
-
-      <Text className="text-[10px] text-amber-600/60 dark:text-amber-400/40 mt-2">
-        Resmi takip sayfasına yönlendirilirsiniz. Verileriniz uygulama tarafından saklanmaz.
-      </Text>
     </View>
   );
 }

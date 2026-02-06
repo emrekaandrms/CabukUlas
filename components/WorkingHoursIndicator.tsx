@@ -1,6 +1,5 @@
 import React from "react";
 import { View, Text } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { WorkingHours } from "@/lib/types";
 import { isCurrentlyOpen } from "@/lib/utils";
 
@@ -14,18 +13,22 @@ export default function WorkingHoursIndicator({ workingHours }: WorkingHoursIndi
   if (isOpen === null) return null;
 
   return (
-    <View className="flex-row items-center mt-1">
+    <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
       <View
-        className={`w-2 h-2 rounded-full mr-1.5 ${
-          isOpen ? "bg-green-500" : "bg-red-400"
-        }`}
+        style={{
+          width: 6,
+          height: 6,
+          borderRadius: 3,
+          backgroundColor: isOpen ? "#34C759" : "#FF3B30",
+          marginRight: 5,
+        }}
       />
-      <Text className={`text-xs ${isOpen ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}`}>
-        {isOpen ? "Şu an açık" : "Şu an kapalı"}
+      <Text style={{ fontSize: 11, color: isOpen ? "#34C759" : "#FF3B30", fontWeight: "500" }}>
+        {isOpen ? "Açık" : "Kapalı"}
       </Text>
       {workingHours.weekdays && (
-        <Text className="text-xs text-slate-400 ml-1">
-          • Haftaiçi {workingHours.weekdays}
+        <Text style={{ fontSize: 11, color: "#AEAEB2", marginLeft: 4 }}>
+          {workingHours.weekdays}
         </Text>
       )}
     </View>

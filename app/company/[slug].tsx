@@ -1,21 +1,11 @@
 import React from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-  Image,
-  Linking,
-} from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Image, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useCompany } from "@/hooks/useCompany";
 import ContactChannelItem from "@/components/ContactChannelItem";
 import CargoTracker from "@/components/CargoTracker";
-import FastestBadge from "@/components/FastestBadge";
-import { Colors } from "@/constants/theme";
 
 export default function CompanyDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -24,25 +14,24 @@ export default function CompanyDetailScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-900 items-center justify-center">
-        <ActivityIndicator size="large" color={Colors.primary} />
-        <Text className="text-slate-400 mt-3">Yükleniyor...</Text>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F5F0", alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator size="large" color="#1A1A1A" />
       </SafeAreaView>
     );
   }
 
   if (error || !company) {
     return (
-      <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-900 items-center justify-center px-8">
-        <Ionicons name="alert-circle-outline" size={64} color={Colors.danger} />
-        <Text className="text-lg font-semibold text-slate-700 dark:text-slate-300 mt-4 text-center">
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F5F0", alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
+        <Ionicons name="alert-circle-outline" size={56} color="#AEAEB2" />
+        <Text style={{ fontSize: 17, fontWeight: "600", color: "#48484A", marginTop: 16, textAlign: "center" }}>
           Firma bulunamadı
         </Text>
         <TouchableOpacity
-          className="mt-4 bg-primary-500 px-6 py-3 rounded-xl"
+          style={{ marginTop: 16, backgroundColor: "#1A1A1A", paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 }}
           onPress={() => router.back()}
         >
-          <Text className="text-white font-semibold">Geri Dön</Text>
+          <Text style={{ color: "#FFFFFF", fontWeight: "600" }}>Geri Dön</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -53,69 +42,69 @@ export default function CompanyDetailScreen() {
   const otherChannels = channels.filter((c) => !c.is_fastest);
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-900" edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F5F0" }} edges={["top"]}>
       {/* Header */}
-      <View className="flex-row items-center px-4 py-3">
+      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingVertical: 12 }}>
         <TouchableOpacity
           onPress={() => router.back()}
-          className="p-1"
+          style={{ padding: 4 }}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons name="arrow-back" size={24} color={Colors.text} />
+          <Ionicons name="arrow-back" size={24} color="#1A1A1A" />
         </TouchableOpacity>
-        <Text
-          className="flex-1 text-lg font-semibold text-slate-900 dark:text-white ml-3"
-          numberOfLines={1}
-        >
+        <Text style={{ flex: 1, fontSize: 17, fontWeight: "600", color: "#1A1A1A", marginLeft: 12 }} numberOfLines={1}>
           {company.name}
         </Text>
         {company.website_url && (
-          <TouchableOpacity
-            onPress={() => Linking.openURL(company.website_url!)}
-            className="p-1"
-          >
-            <Ionicons name="globe-outline" size={22} color={Colors.primary} />
+          <TouchableOpacity onPress={() => Linking.openURL(company.website_url!)} style={{ padding: 4 }}>
+            <Ionicons name="globe-outline" size={22} color="#8E8E93" />
           </TouchableOpacity>
         )}
       </View>
 
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        {/* Firma bilgi karti */}
-        <View className="items-center pt-4 pb-6 px-4">
-          <View className="w-20 h-20 rounded-2xl bg-white dark:bg-slate-800 items-center justify-center shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+        {/* Company info */}
+        <View style={{ alignItems: "center", paddingTop: 8, paddingBottom: 24, paddingHorizontal: 20 }}>
+          <View style={{
+            width: 72,
+            height: 72,
+            borderRadius: 20,
+            backgroundColor: "#FFFFFF",
+            alignItems: "center",
+            justifyContent: "center",
+            borderWidth: 1,
+            borderColor: "#E8E8E3",
+            overflow: "hidden",
+          }}>
             {company.logo_url ? (
-              <Image
-                source={{ uri: company.logo_url }}
-                className="w-20 h-20"
-                resizeMode="contain"
-              />
+              <Image source={{ uri: company.logo_url }} style={{ width: 72, height: 72 }} resizeMode="contain" />
             ) : (
-              <Text className="text-3xl font-bold text-primary-500">
+              <Text style={{ fontSize: 28, fontWeight: "800", color: "#1A1A1A" }}>
                 {company.name.charAt(0)}
               </Text>
             )}
           </View>
-          <Text className="text-xl font-bold text-slate-900 dark:text-white mt-3">
+          <Text style={{ fontSize: 22, fontWeight: "700", color: "#1A1A1A", marginTop: 12 }}>
             {company.name}
           </Text>
           {company.category && (
-            <Text className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            <Text style={{ fontSize: 14, color: "#8E8E93", marginTop: 4 }}>
               {company.category.name}
             </Text>
           )}
           {company.description && (
-            <Text className="text-sm text-slate-500 dark:text-slate-400 mt-2 text-center px-4">
+            <Text style={{ fontSize: 13, color: "#8E8E93", marginTop: 6, textAlign: "center" }}>
               {company.description}
             </Text>
           )}
         </View>
 
-        {/* En Hizli Yol - Vurgulu */}
+        {/* Fastest Channel */}
         {fastestChannel && (
-          <View className="px-4 mb-2">
-            <View className="flex-row items-center mb-3">
-              <Ionicons name="flash" size={18} color="#0d9488" />
-              <Text className="text-base font-bold text-teal-700 dark:text-teal-400 ml-1.5">
+          <View style={{ paddingHorizontal: 16, marginBottom: 8 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+              <Ionicons name="flash" size={16} color="#FF6B35" />
+              <Text style={{ fontSize: 15, fontWeight: "700", color: "#FF6B35", marginLeft: 6 }}>
                 En Hızlı Yol
               </Text>
             </View>
@@ -123,11 +112,11 @@ export default function CompanyDetailScreen() {
           </View>
         )}
 
-        {/* Diger Kanallar */}
+        {/* Other Channels */}
         {otherChannels.length > 0 && (
-          <View className="px-4 mt-2">
-            <Text className="text-base font-bold text-slate-900 dark:text-white mb-3">
-              Diğer İletişim Kanalları
+          <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
+            <Text style={{ fontSize: 15, fontWeight: "700", color: "#1A1A1A", marginBottom: 10 }}>
+              Tüm İletişim Kanalları
             </Text>
             {otherChannels.map((channel) => (
               <ContactChannelItem key={channel.id} channel={channel} />
@@ -135,29 +124,25 @@ export default function CompanyDetailScreen() {
           </View>
         )}
 
-        {/* Kargo Takip */}
+        {/* Cargo */}
         {company.has_cargo_tracking && company.cargo_tracking_url && (
-          <CargoTracker
-            companyName={company.name}
-            trackingUrl={company.cargo_tracking_url}
-          />
+          <CargoTracker companyName={company.name} trackingUrl={company.cargo_tracking_url} />
         )}
 
-        {/* Bilgi kaynagi */}
+        {/* Source */}
         {company.website_url && (
           <TouchableOpacity
-            className="flex-row items-center justify-center py-4 mt-4 mb-8"
+            style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", paddingVertical: 20, marginTop: 8 }}
             onPress={() => Linking.openURL(company.website_url!)}
           >
-            <Ionicons name="information-circle-outline" size={16} color={Colors.textSecondary} />
-            <Text className="text-xs text-slate-400 ml-1.5">
-              Bilgiler resmi web sitesinden derlenmiştir
+            <Ionicons name="information-circle-outline" size={14} color="#AEAEB2" />
+            <Text style={{ fontSize: 11, color: "#AEAEB2", marginLeft: 4 }}>
+              Bilgiler resmi kaynaktan derlenmiştir
             </Text>
-            <Ionicons name="open-outline" size={12} color={Colors.textSecondary} className="ml-1" />
           </TouchableOpacity>
         )}
 
-        <View className="h-6" />
+        <View style={{ height: 24 }} />
       </ScrollView>
     </SafeAreaView>
   );

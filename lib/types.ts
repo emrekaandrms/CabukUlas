@@ -16,7 +16,8 @@ export type ChannelType =
   | "twitter"
   | "whatsapp"
   | "instagram"
-  | "app";
+  | "app"
+  | "sikayetvar";
 
 export interface WorkingHours {
   weekdays?: string;
@@ -58,7 +59,6 @@ export interface CompanyWithChannels extends Company {
   contact_channels: ContactChannel[];
 }
 
-// Arama sonucu tipi
 export interface SearchResult {
   id: string;
   name: string;

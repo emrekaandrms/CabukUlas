@@ -1,49 +1,46 @@
 import React from "react";
 import { View, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Colors } from "@/constants/theme";
 
 interface SearchBarProps {
   value: string;
   onChangeText: (text: string) => void;
   onClear: () => void;
   isSearching?: boolean;
-  placeholder?: string;
   autoFocus?: boolean;
 }
 
-export default function SearchBar({
-  value,
-  onChangeText,
-  onClear,
-  isSearching = false,
-  placeholder = "Firma ara... (ör: Trendyol, Yurtiçi Kargo)",
-  autoFocus = false,
-}: SearchBarProps) {
+export default function SearchBar({ value, onChangeText, onClear, isSearching, autoFocus }: SearchBarProps) {
   return (
-    <View className="flex-row items-center bg-white dark:bg-slate-800 rounded-2xl px-4 py-3 mx-4 shadow-sm border border-slate-100 dark:border-slate-700">
-      <Ionicons
-        name="search-outline"
-        size={22}
-        color={Colors.textSecondary}
-      />
+    <View style={{
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: "#F5F5F0",
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      height: 44,
+    }}>
+      <Ionicons name="search" size={18} color="#AEAEB2" />
       <TextInput
-        className="flex-1 ml-3 text-base text-slate-900 dark:text-slate-100"
+        style={{
+          flex: 1,
+          marginLeft: 10,
+          fontSize: 15,
+          color: "#1A1A1A",
+          paddingVertical: 0,
+        }}
         value={value}
         onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor={Colors.textSecondary}
+        placeholder="Firma adı yazın..."
+        placeholderTextColor="#AEAEB2"
         autoFocus={autoFocus}
-        autoCapitalize="none"
-        autoCorrect={false}
         returnKeyType="search"
+        autoCorrect={false}
       />
-      {isSearching && (
-        <ActivityIndicator size="small" color={Colors.primary} />
-      )}
+      {isSearching && <ActivityIndicator size="small" color="#8E8E93" style={{ marginRight: 8 }} />}
       {value.length > 0 && !isSearching && (
         <TouchableOpacity onPress={onClear} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-          <Ionicons name="close-circle" size={20} color={Colors.textSecondary} />
+          <Ionicons name="close-circle" size={18} color="#AEAEB2" />
         </TouchableOpacity>
       )}
     </View>
