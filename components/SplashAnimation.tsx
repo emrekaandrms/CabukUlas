@@ -78,7 +78,7 @@ export default function SplashAnimation() {
       </Animated.Text>
 
       <Animated.Text style={[styles.tagline, { opacity: taglineOpacity }]}>
-        En dogru siradaki adima sakin ve hizli ulas
+        En doğru sıradaki adıma sakin ve hızlı ulaş
       </Animated.Text>
 
       <View style={styles.loadingContainer}>
@@ -94,7 +94,7 @@ export default function SplashAnimation() {
             },
           ]}
         />
-        <Text style={styles.loadingText}>Veriler hazirlaniyor</Text>
+        <Text style={styles.loadingText}>Veriler hazırlanıyor</Text>
       </View>
     </View>
   );

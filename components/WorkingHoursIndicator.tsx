@@ -35,7 +35,7 @@ export default function WorkingHoursIndicator({ workingHours, light }: WorkingHo
           },
         ]}
       >
-        Su an {isOpen ? "acik" : "kapali"}
+        Şu an {isOpen ? "açık" : "kapalı"}
       </Text>
       {activeHours && (
         <Text

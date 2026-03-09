@@ -2,6 +2,7 @@ import React from "react";
 import { Text, FlatList, TouchableOpacity, StyleSheet, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 import { Category } from "@/lib/types";
 import { getCategoryIcon } from "@/lib/utils";
 import {
@@ -26,11 +27,15 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
       <TouchableOpacity
         style={styles.chip}
         activeOpacity={0.7}
-        onPress={() =>
-          router.push(
-            `/category/${item.id}?name=${encodeURIComponent(item.name)}`
-          )
-        }
+        onPress={() => {
+          void trackAnalyticsEvent({
+            event_name: "category_opened",
+            source_screen: "/home",
+            category_id: item.id,
+            metadata: { category_name: item.name },
+          });
+          router.push(`/category/${item.id}?name=${encodeURIComponent(item.name)}`);
+        }}
       >
         <View style={styles.chipIconContainer}>
           <Ionicons name={iconName as any} size={15} color={Colors.text} />

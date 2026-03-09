@@ -18,6 +18,7 @@ import CargoTracker from "@/components/CargoTracker";
 import SkeletonLoader from "@/components/SkeletonLoader";
 import StateView from "@/components/StateView";
 import SectionHeader from "@/components/SectionHeader";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 import { formatUpdatedAt, getCompanyTrustSignals } from "@/lib/utils";
 import {
   BorderRadius,
@@ -36,6 +37,12 @@ export default function CompanyDetailScreen() {
   useEffect(() => {
     if (company) {
       addRecent(company);
+      void trackAnalyticsEvent({
+        event_name: "company_opened",
+        source_screen: "/company",
+        company_id: company.id,
+        metadata: { slug: company.slug },
+      });
     }
   }, [addRecent, company]);
 
@@ -57,9 +64,9 @@ export default function CompanyDetailScreen() {
       <SafeAreaView style={styles.container} edges={["top"]}>
         <StateView
           icon="alert-circle-outline"
-          title="Firma bulunamadi"
-          subtitle="Bu profil kaldirilmis olabilir veya baglanti su anda ulasilamiyor."
-          actionLabel="Geri don"
+          title="Firma bulunamadı"
+          subtitle="Bu profil kaldırılmış olabilir veya bağlantı şu anda ulaşılamıyor."
+          actionLabel="Geri dön"
           onPressAction={() => router.back()}
         />
       </SafeAreaView>
@@ -87,7 +94,15 @@ export default function CompanyDetailScreen() {
         <View style={styles.headerActions}>
           {company.website_url ? (
             <TouchableOpacity
-              onPress={() => Linking.openURL(company.website_url!)}
+              onPress={() => {
+                void trackAnalyticsEvent({
+                  event_name: "external_link_opened",
+                  source_screen: `/company/${company.slug}`,
+                  company_id: company.id,
+                  channel_type: "website",
+                });
+                Linking.openURL(company.website_url!);
+              }}
               style={styles.headerBtn}
             >
               <Ionicons name="globe-outline" size={20} color={Colors.textSecondary} />
@@ -130,7 +145,7 @@ export default function CompanyDetailScreen() {
 
           <Text style={styles.heroDesc}>
             {company.description ||
-              "Bu profil, en dogru temas kanalina hizla gecmeniz icin hazirlandi."}
+              "Bu profil, en doğru temas kanalına hızla geçmeniz için hazırlandı."}
           </Text>
 
           <View style={styles.signalRow}>
@@ -145,8 +160,8 @@ export default function CompanyDetailScreen() {
         {fastestChannel ? (
           <View style={styles.section}>
             <SectionHeader
-              title="Onerilen sonraki adim"
-              subtitle="En hizli iletisim yolu burada one cikiyor"
+              title="Önerilen sonraki adım"
+              subtitle="En hızlı iletişim yolu burada öne çıkıyor"
               icon="flash"
             />
             <ContactChannelItem channel={fastestChannel} prominent />
@@ -156,8 +171,8 @@ export default function CompanyDetailScreen() {
         {otherChannels.length > 0 ? (
           <View style={styles.section}>
             <SectionHeader
-              title="Alternatif temas kanallari"
-              subtitle="Durumunuza gore farkli bir yol secin"
+              title="Alternatif temas kanalları"
+              subtitle="Durumunuza göre farklı bir yol seçin"
             />
             <View style={styles.sectionBody}>
               {otherChannels.map((channel) => (
@@ -171,7 +186,7 @@ export default function CompanyDetailScreen() {
           <View style={styles.section}>
             <SectionHeader
               title="Kargo takibi"
-              subtitle="Resmi takip baglantisina dogrudan gecis"
+              subtitle="Resmi takip bağlantısına doğrudan geçiş"
             />
             <CargoTracker
               companyName={company.name}
@@ -182,8 +197,8 @@ export default function CompanyDetailScreen() {
 
         <View style={styles.section}>
           <SectionHeader
-            title="Guven ve kaynak"
-            subtitle="Bilginin nereden geldigi gorunur olsun"
+            title="Güven ve kaynak"
+            subtitle="Bilginin nereden geldiği görünür olsun"
           />
           <View style={styles.infoCard}>
             <View style={styles.infoRow}>
@@ -193,7 +208,7 @@ export default function CompanyDetailScreen() {
                 color={Colors.textSecondary}
               />
               <Text style={styles.infoText}>
-                Kanallar resmi kaynak baglantilariyla derlenir ve gozden gecirilir.
+                Kanallar resmi kaynak bağlantılarıyla derlenir ve gözden geçirilir.
               </Text>
             </View>
             {updatedAt ? (
@@ -206,9 +221,17 @@ export default function CompanyDetailScreen() {
               <TouchableOpacity
                 style={styles.inlineAction}
                 activeOpacity={0.75}
-                onPress={() => Linking.openURL(company.website_url!)}
+                onPress={() => {
+                  void trackAnalyticsEvent({
+                    event_name: "external_link_opened",
+                    source_screen: `/company/${company.slug}`,
+                    company_id: company.id,
+                    channel_type: "website",
+                  });
+                  Linking.openURL(company.website_url!);
+                }}
               >
-                <Text style={styles.inlineActionText}>Resmi siteyi ac</Text>
+                <Text style={styles.inlineActionText}>Resmi siteyi aç</Text>
                 <Ionicons name="open-outline" size={16} color={Colors.accent} />
               </TouchableOpacity>
             ) : null}

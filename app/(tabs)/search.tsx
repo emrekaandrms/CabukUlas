@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -10,13 +10,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import SearchBar from "@/components/SearchBar";
-import CompanyCard from "@/components/CompanyCard";
+import SearchResultItem from "@/components/SearchResultItem";
 import SkeletonLoader from "@/components/SkeletonLoader";
 import SectionHeader from "@/components/SectionHeader";
 import StateView from "@/components/StateView";
 import { useSearch } from "@/hooks/useSearch";
 import { usePopularCompanies } from "@/hooks/useCompany";
 import { useQuickAccess, useSearchHistory } from "@/hooks/useQuickAccess";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 import {
   BorderRadius,
   Colors,
@@ -30,14 +31,21 @@ export default function SearchScreen() {
   const { recents } = useQuickAccess();
   const { history, saveSearch, clearHistory } = useSearchHistory();
   const { data: popular } = usePopularCompanies();
-  const { query, updateQuery, clearSearch, results, isSearching, isActive, error } =
-    useSearch();
+  const { query, updateQuery, clearSearch, results, isSearching, isActive, error, indexCount } =
+    useSearch({ sourceScreen: "/search" });
 
-  useEffect(() => {
-    if (!isSearching && query.trim().length >= 2 && results.length > 0) {
+  const handleSubmit = React.useCallback(() => {
+    if (query.trim().length >= 2 && results.length > 0) {
       saveSearch(query.trim());
     }
-  }, [isSearching, query, results, saveSearch]);
+    if (query.trim().length > 0) {
+      void trackAnalyticsEvent({
+        event_name: "search_submitted",
+        source_screen: "/search",
+        query_text: query.trim(),
+      });
+    }
+  }, [query, results.length, saveSearch]);
 
   const renderDiscovery = () => (
     <ScrollView
@@ -47,9 +55,9 @@ export default function SearchScreen() {
     >
       <View style={styles.hero}>
         <Text style={styles.heroEyebrow}>Arama</Text>
-        <Text style={styles.heroTitle}>Hizli eslesme, guvenli sonraki adim.</Text>
+        <Text style={styles.heroTitle}>Hızlı eşleşme, güvenli sonraki adım.</Text>
         <Text style={styles.heroSubtitle}>
-          Sirket, marka veya hizmet arayip en uygun temas yolunu bulun.
+          Şirket, marka veya hizmet arayıp en uygun temas yolunu bulun.
         </Text>
       </View>
 
@@ -57,7 +65,7 @@ export default function SearchScreen() {
         <View style={styles.section}>
           <SectionHeader
             title="Son aramalar"
-            subtitle="Tek dokunusla tekrar dene"
+            subtitle="Tek dokunuşla tekrar dene"
             actionLabel="Temizle"
             onPressAction={clearHistory}
           />
@@ -79,7 +87,7 @@ export default function SearchScreen() {
 
       {recents.length > 0 && (
         <View style={styles.section}>
-          <SectionHeader title="Son baktiklarin" subtitle="Sik kullandigin firmalar" />
+          <SectionHeader title="Son baktıkların" subtitle="Sık kullandığın firmalar" />
           <View style={styles.cardStack}>
             {recents.slice(0, 3).map((item) => (
               <TouchableOpacity
@@ -106,7 +114,7 @@ export default function SearchScreen() {
       )}
 
       <View style={styles.section}>
-        <SectionHeader title="Populer kisayollar" subtitle="Hizli baslamak icin" />
+        <SectionHeader title="Popüler kısayollar" subtitle="Hızlı başlamak için" />
         <View style={styles.inlineGrid}>
           {(popular || []).slice(0, 6).map((company) => (
             <TouchableOpacity
@@ -131,6 +139,7 @@ export default function SearchScreen() {
           value={query}
           onChangeText={updateQuery}
           onClear={clearSearch}
+          onSubmit={handleSubmit}
           isSearching={isSearching}
         />
       </View>
@@ -144,31 +153,46 @@ export default function SearchScreen() {
       ) : error ? (
         <StateView
           icon="cloud-offline-outline"
-          title="Arama su anda tamamlanamadi"
-          subtitle="Baglantiyi kontrol edip tekrar deneyebilirsiniz."
-          actionLabel="Aramayi temizle"
+          title="Arama verileri yüklenemedi"
+          subtitle="İnternet bağlantınızı kontrol edip tekrar deneyin."
+          actionLabel="Aramayı temizle"
           onPressAction={clearSearch}
         />
       ) : results.length === 0 ? (
         <StateView
           icon="search-outline"
-          title="Sonuc bulunamadi"
-          subtitle="Farkli bir firma adi, kategori veya daha kisa bir ifade deneyin."
-          actionLabel="Aramayi temizle"
+          title="Sonuç bulunamadı"
+          subtitle="Farklı bir firma adı, kategori veya daha kısa bir ifade deneyin."
+          actionLabel="Aramayı temizle"
           onPressAction={clearSearch}
         />
       ) : (
         <FlatList
           data={results}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <CompanyCard company={item} />}
+          renderItem={({ item }) => (
+            <SearchResultItem
+              company={item}
+              onPress={() => {
+                if (query.trim().length >= 2) {
+                  saveSearch(query.trim());
+                }
+                void trackAnalyticsEvent({
+                  event_name: "search_result_clicked",
+                  source_screen: "/search",
+                  query_text: query.trim(),
+                  company_id: item.id,
+                });
+              }}
+            />
+          )}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={
             <View style={styles.resultInfo}>
-              <Text style={styles.resultCount}>{results.length} sonuc bulundu</Text>
+              <Text style={styles.resultCount}>{results.length} sonuç bulundu</Text>
               <Text style={styles.resultSubtitle}>
-                Onerilen temas ve resmi erisim sinyalleriyle birlikte listelendi.
+                {indexCount} firma içinden cihazda anında filtreleniyor.
               </Text>
             </View>
           }

@@ -23,8 +23,8 @@ import {
 } from "@/constants/theme";
 
 const FILTERS = [
-  { key: "recommended", label: "Onerilen" },
-  { key: "open", label: "Simdi acik" },
+  { key: "recommended", label: "Önerilen" },
+  { key: "open", label: "Şimdi açık" },
   { key: "az", label: "A-Z" },
 ] as const;
 
@@ -83,7 +83,7 @@ export default function CategoryScreen() {
         <View style={styles.headerText}>
           <Text style={styles.headerTitle}>{categoryName}</Text>
           <Text style={styles.headerSubtitle}>
-            Firmalari en hizli temas sinyaline gore tara
+            Firmaları en hızlı temas sinyaline göre tara
           </Text>
         </View>
       </View>
@@ -106,7 +106,7 @@ export default function CategoryScreen() {
                   {companies.length} firma bulundu
                 </Text>
                 <Text style={styles.resultSubtitle}>
-                  Onerilen kanal, aciklik durumu ve alfabetik siralama ile filtrelenebilir.
+                  Önerilen kanal, açıklık durumu ve alfabetik sıralama ile filtrelenebilir.
                 </Text>
               </View>
               <View style={styles.filterRow}>
@@ -138,7 +138,7 @@ export default function CategoryScreen() {
         <StateView
           icon="business-outline"
           title="Bu kategoride firma yok"
-          subtitle="Yakinda yeni firmalar eklendiginde burada gorunecek."
+          subtitle="Yakında yeni firmalar eklendiğinde burada görünecek."
         />
       )}
     </SafeAreaView>

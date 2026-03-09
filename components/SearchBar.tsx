@@ -7,33 +7,44 @@ interface SearchBarProps {
   value: string;
   onChangeText: (text: string) => void;
   onClear: () => void;
+  onSubmit?: () => void;
   isSearching?: boolean;
   autoFocus?: boolean;
+  prominent?: boolean;
+  placeholder?: string;
 }
 
 export default function SearchBar({
   value,
   onChangeText,
   onClear,
+  onSubmit,
   isSearching,
   autoFocus,
+  prominent = false,
+  placeholder = "Firma, marka veya hizmet ara",
 }: SearchBarProps) {
   return (
-    <View style={styles.container}>
-      <View style={styles.iconWrap}>
-        <Ionicons name="search" size={17} color={Colors.textSecondary} />
+    <View style={[styles.container, prominent && styles.containerProminent]}>
+      <View style={[styles.iconWrap, prominent && styles.iconWrapProminent]}>
+        <Ionicons
+          name="search"
+          size={prominent ? 24 : 17}
+          color={Colors.textSecondary}
+        />
       </View>
       <TextInput
-        style={styles.input}
+        style={[styles.input, prominent && styles.inputProminent]}
         value={value}
         onChangeText={onChangeText}
-        placeholder="Firma, marka veya hizmet ara"
+        placeholder={placeholder}
         placeholderTextColor={Colors.textSecondary}
         autoFocus={autoFocus}
         returnKeyType="search"
         autoCorrect={false}
         autoCapitalize="none"
         selectionColor={Colors.accent}
+        onSubmitEditing={onSubmit}
       />
       {isSearching && (
         <ActivityIndicator
@@ -67,6 +78,12 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     ...Shadows.small,
   },
+  containerProminent: {
+    height: 74,
+    borderRadius: BorderRadius.xl,
+    paddingHorizontal: 12,
+    ...Shadows.medium,
+  },
   iconWrap: {
     width: 40,
     height: 40,
@@ -75,12 +92,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: Colors.surfaceSecondary,
   },
+  iconWrapProminent: {
+    width: 52,
+    height: 52,
+    borderRadius: BorderRadius.md,
+  },
   input: {
     flex: 1,
     ...Typography.bodyStrong,
     marginLeft: 10,
     color: Colors.text,
     paddingVertical: 0,
+  },
+  inputProminent: {
+    fontSize: 22,
+    lineHeight: 28,
+    fontWeight: "700",
+    marginLeft: 14,
   },
   clearButton: {
     padding: 6,

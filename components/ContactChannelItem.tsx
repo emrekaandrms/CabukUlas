@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 import { ContactChannel } from "@/lib/types";
 import { getChannelIcon, getChannelLabel, openChannel } from "@/lib/utils";
 import {
@@ -22,6 +23,13 @@ export default function ContactChannelItem({ channel, prominent }: ContactChanne
   const hasOfficialSource = Boolean(channel.official_source_url);
 
   const handlePress = () => {
+    void trackAnalyticsEvent({
+      event_name: "contact_channel_clicked",
+      source_screen: "/company",
+      company_id: channel.company_id,
+      contact_channel_id: channel.id,
+      channel_type: channel.channel_type,
+    });
     openChannel(channel.channel_type, channel.value);
   };
 

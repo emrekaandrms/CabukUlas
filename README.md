@@ -83,6 +83,22 @@ npx eas submit --platform ios
 npx eas submit --platform android
 ```
 
+## Admin Dashboard
+
+Web tabanli admin paneli `admin-web/` altindadir.
+
+```bash
+cp admin-web/.env.example admin-web/.env.local
+npm run admin:dev
+```
+
+Build kontrolu icin:
+
+```bash
+npm run admin:typecheck
+npm run admin:build
+```
+
 ## Veri Guncelleme
 
 Firma iletisim bilgileri `supabase/seed.sql` dosyasinda tanimlidir.

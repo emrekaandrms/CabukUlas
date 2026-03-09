@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Linking, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 import {
   BorderRadius,
   Colors,
@@ -19,6 +20,12 @@ export default function CargoTracker({ companyName, trackingUrl }: CargoTrackerP
   const handleTrack = () => {
     if (!trackingCode.trim()) return;
     const url = trackingUrl.replace("{code}", trackingCode.trim());
+    void trackAnalyticsEvent({
+      event_name: "cargo_tracking_clicked",
+      source_screen: "/company",
+      channel_type: "cargo_tracking",
+      metadata: { company_name: companyName },
+    });
     Linking.openURL(url);
   };
 
@@ -31,7 +38,7 @@ export default function CargoTracker({ companyName, trackingUrl }: CargoTrackerP
         <View>
           <Text style={styles.title}>Kargo Takip</Text>
           <Text style={styles.subtitle}>
-            {companyName} resmi takip sayfasina guvenli gecis
+            {companyName} resmi takip sayfasına güvenli geçiş
           </Text>
         </View>
       </View>
@@ -42,7 +49,7 @@ export default function CargoTracker({ companyName, trackingUrl }: CargoTrackerP
           size={12}
           color={Colors.textSecondary}
         />
-        <Text style={styles.noteText}>Takip kodunuz yalnizca resmi baglantiya aktarilir</Text>
+        <Text style={styles.noteText}>Takip kodunuz yalnızca resmi bağlantıya aktarılır</Text>
       </View>
 
       <View style={styles.inputRow}>
@@ -50,7 +57,7 @@ export default function CargoTracker({ companyName, trackingUrl }: CargoTrackerP
           style={styles.input}
           value={trackingCode}
           onChangeText={setTrackingCode}
-          placeholder="Takip numarasi"
+          placeholder="Takip numarası"
           placeholderTextColor={Colors.textTertiary}
           autoCapitalize="characters"
           returnKeyType="go"

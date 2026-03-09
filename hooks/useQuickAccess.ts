@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 import { Company, CompanyBookmark, SearchHistoryItem } from "@/lib/types";
 
 const FAVORITES_KEY = "cabukulas:favorites";
@@ -64,6 +65,11 @@ export function useQuickAccess() {
         : [toBookmark(company), ...current].slice(0, MAX_RECENTS);
 
       await writeList(FAVORITES_KEY, next);
+      void trackAnalyticsEvent({
+        event_name: exists ? "favorite_removed" : "favorite_added",
+        source_screen: `/company/${company.slug}`,
+        company_id: company.id,
+      });
       return next;
     },
     onSuccess: (next) => {

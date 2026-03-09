@@ -19,7 +19,10 @@ import CompanyCard from "@/components/CompanyCard";
 import SkeletonLoader from "@/components/SkeletonLoader";
 import SectionHeader from "@/components/SectionHeader";
 import StateView from "@/components/StateView";
-import { getCompanyTrustSignals } from "@/lib/utils";
+import SearchBar from "@/components/SearchBar";
+import SearchResultItem from "@/components/SearchResultItem";
+import { useSearch } from "@/hooks/useSearch";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 import {
   BorderRadius,
   Colors,
@@ -28,17 +31,19 @@ import {
   Typography,
 } from "@/constants/theme";
 
-function getGreeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 6) return "Gec saatler icin hizli erisim";
-  if (hour < 12) return "Gun icin hazir bir rehber";
-  if (hour < 18) return "Dogru kanala hizla ulasin";
-  return "Aksam icin sakin bir hizli erisim";
-}
-
 export default function HomeScreen() {
   const router = useRouter();
   const { favorites, recents } = useQuickAccess();
+  const {
+    query: homeQuery,
+    updateQuery: updateHomeQuery,
+    clearSearch: clearHomeSearch,
+    results: homeResults,
+    isSearching: isHomeSearching,
+    isActive: isHomeSearchActive,
+    indexCount,
+    error: homeSearchError,
+  } = useSearch({ maxResults: 8, sourceScreen: "/home" });
   const {
     data: categories,
     isLoading: catLoading,
@@ -75,35 +80,83 @@ export default function HomeScreen() {
         }
       >
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>CabukUlas</Text>
-          <Text style={styles.brandName}>Dogru firmaya, dogru kanalla ulas.</Text>
-          <Text style={styles.subtitle}>{getGreeting()}</Text>
+          <Text style={styles.eyebrow}>ÇabukUlaş</Text>
+          <Text style={styles.brandName}>Firma arayın.</Text>
+          <Text style={styles.subtitle}>
+            Telefon, canlı destek, e-posta ve resmi bağlantıları tek ekranda bulun.
+          </Text>
         </View>
 
-        <TouchableOpacity
-          style={styles.searchBar}
-          activeOpacity={0.8}
-          onPress={() => router.push("/search")}
-        >
-          <View style={styles.searchIconWrap}>
-            <Ionicons name="search" size={18} color={Colors.textSecondary} />
-          </View>
-          <View style={styles.searchCopy}>
-            <Text style={styles.searchTitle}>Firma veya hizmet ara</Text>
-            <Text style={styles.searchSubtitle}>
-              Hemen en uygun temas kanalini bul
-            </Text>
-          </View>
-          <View style={styles.searchHint}>
-            <Ionicons name="arrow-forward" size={16} color={Colors.accent} />
-          </View>
-        </TouchableOpacity>
+        <View style={styles.searchArea}>
+          <SearchBar
+            value={homeQuery}
+            onChangeText={updateHomeQuery}
+            onClear={clearHomeSearch}
+            isSearching={isHomeSearching}
+            autoFocus
+            prominent
+            placeholder="Firma adı, marka veya hizmet yazın"
+            onSubmit={() => {
+              if (homeQuery.trim().length > 0) {
+                void trackAnalyticsEvent({
+                  event_name: "search_submitted",
+                  source_screen: "/home",
+                  query_text: homeQuery.trim(),
+                });
+              }
+            }}
+          />
 
+          {isHomeSearchActive ? (
+            <View style={styles.searchResultsSection}>
+              <SectionHeader
+                title="Sonuçlar"
+                subtitle={`${indexCount} firma arasında anında listeleniyor`}
+              />
+              {isHomeSearching ? (
+                <SkeletonLoader type="cards" count={3} />
+              ) : homeSearchError ? (
+                <StateView
+                  compact
+                  icon="cloud-offline-outline"
+                  title="Arama verileri yüklenemedi"
+                  subtitle="İnternet bağlantınızı kontrol edip sayfayı yenileyin."
+                />
+              ) : homeResults.length > 0 ? (
+                homeResults.map((company) => (
+                  <SearchResultItem
+                    key={company.id}
+                    company={company}
+                    compact
+                    onPress={() => {
+                      void trackAnalyticsEvent({
+                        event_name: "search_result_clicked",
+                        source_screen: "/home",
+                        query_text: homeQuery.trim(),
+                        company_id: company.id,
+                      });
+                    }}
+                  />
+                ))
+              ) : (
+                <StateView
+                  compact
+                  icon="search-outline"
+                  title="Sonuç bulunamadı"
+                  subtitle="Farklı bir firma, marka veya hizmet adı deneyin."
+                />
+              )}
+            </View>
+          ) : null}
+        </View>
+
+        {!isHomeSearchActive && (
+          <>
         {recents.length > 0 && (
           <View style={styles.section}>
             <SectionHeader
-              title="Son baktiklarin"
-              subtitle="Tekrar erisim icin hazir"
+              title="Son baktıkların"
+              subtitle="Tekrar erişim için hazır"
               actionLabel="Kaydedilenler"
               onPressAction={() => router.push("/saved")}
             />
@@ -147,8 +200,8 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <SectionHeader
             title="Kategoriler"
-            subtitle="Isme emin degilsen sektorden ilerle"
-            actionLabel="Tumunu ac"
+            subtitle="İsme emin değilsen sektörden ilerle"
+            actionLabel="Tümünü aç"
             onPressAction={() => router.push("/categories")}
           />
           {catLoading ? (
@@ -159,17 +212,17 @@ export default function HomeScreen() {
             <StateView
               compact
               icon="grid-outline"
-              title="Kategori hazir degil"
-              subtitle="Kategori listesi yuklenirken bir sorun olustu."
+              title="Kategori hazır değil"
+              subtitle="Kategori listesi yüklenirken bir sorun oluştu."
             />
           )}
         </View>
 
-        {!popLoading && featuredCompany && (
+        {!popLoading && featuredCompany && !isHomeSearchActive && (
           <View style={styles.section}>
             <SectionHeader
-              title="One cikan erisim"
-              subtitle="Hizli karar icin editor secimi"
+              title="Öne çıkan erişim"
+              subtitle="Hızlı karar için editör seçimi"
               icon="sparkles"
             />
             <TouchableOpacity
@@ -179,7 +232,7 @@ export default function HomeScreen() {
             >
               <View style={styles.featuredTopRow}>
                 <View style={styles.featuredBadge}>
-                  <Text style={styles.featuredBadgeText}>One cikan</Text>
+                  <Text style={styles.featuredBadgeText}>Öne çıkan</Text>
                 </View>
                 <View style={styles.featuredBadgeMuted}>
                   <Text style={styles.featuredBadgeMutedText}>Sponsorlu alan</Text>
@@ -208,16 +261,8 @@ export default function HomeScreen() {
                 </View>
               </View>
 
-              <View style={styles.featuredSignalRow}>
-                {getCompanyTrustSignals(featuredCompany).map((signal) => (
-                  <View key={signal} style={styles.featuredSignal}>
-                    <Text style={styles.featuredSignalText}>{signal}</Text>
-                  </View>
-                ))}
-              </View>
-
               <View style={styles.featuredCTA}>
-                <Text style={styles.featuredCTAText}>Firma kartini ve en hizli yolu ac</Text>
+                <Text style={styles.featuredCTAText}>Firma kartını ve en hızlı yolu aç</Text>
                 <Ionicons name="arrow-forward" size={16} color={Colors.textInverse} />
               </View>
             </TouchableOpacity>
@@ -228,8 +273,8 @@ export default function HomeScreen() {
           <View style={styles.section}>
             <SectionHeader
               title="Kaydettiklerin"
-              subtitle="Guvendigin firmalar tek yerde"
-              actionLabel="Tumunu gor"
+              subtitle="Güvendiğin firmalar tek yerde"
+              actionLabel="Tümünü gör"
               onPressAction={() => router.push("/saved")}
             />
             <ScrollView
@@ -258,8 +303,8 @@ export default function HomeScreen() {
 
         <View style={styles.section}>
           <SectionHeader
-            title="Populer firmalar"
-            subtitle="Hizli ulasim icin en cok bakilanlar"
+            title="Popüler firmalar"
+            subtitle="Hızlı ulaşım için en çok bakılanlar"
           />
           {popLoading ? (
             <SkeletonLoader type="cards" count={4} />
@@ -271,11 +316,13 @@ export default function HomeScreen() {
             <StateView
               compact
               icon="business-outline"
-              title="Henuz firma yok"
-              subtitle="Icerik eklendiginde burada gorunecek."
+              title="Henüz firma yok"
+              subtitle="İçerik eklendiğinde burada görünecek."
             />
           )}
         </View>
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -292,7 +339,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: Spacing.screenPadding,
     paddingTop: 12,
-    paddingBottom: 8,
+    paddingBottom: 4,
   },
   eyebrow: {
     ...Typography.micro,
@@ -307,48 +354,16 @@ const styles = StyleSheet.create({
   subtitle: {
     ...Typography.body,
     marginTop: 10,
-    maxWidth: "80%",
+    maxWidth: "92%",
   },
-  searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.xl,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    marginHorizontal: Spacing.screenPadding,
-    marginTop: 18,
+  searchArea: {
+    marginTop: 20,
     marginBottom: 28,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    ...Shadows.small,
+    gap: 18,
+    paddingHorizontal: Spacing.screenPadding,
   },
-  searchIconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: BorderRadius.md,
-    backgroundColor: Colors.accentLight,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  searchCopy: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  searchTitle: {
-    ...Typography.bodyStrong,
-  },
-  searchSubtitle: {
-    ...Typography.meta,
-    marginTop: 2,
-  },
-  searchHint: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: Colors.surfaceSecondary,
-    alignItems: "center",
-    justifyContent: "center",
+  searchResultsSection: {
+    marginHorizontal: -Spacing.screenPadding,
   },
   section: {
     marginBottom: Spacing.section,
@@ -452,24 +467,8 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.65)",
     marginTop: 4,
   },
-  featuredSignalRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginTop: 18,
-  },
-  featuredSignal: {
-    backgroundColor: "rgba(255,255,255,0.12)",
-    borderRadius: BorderRadius.sm,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  featuredSignalText: {
-    ...Typography.micro,
-    color: "rgba(255,255,255,0.82)",
-  },
   featuredCTA: {
-    marginTop: 20,
+    marginTop: 18,
     paddingTop: 18,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: "rgba(255,255,255,0.16)",

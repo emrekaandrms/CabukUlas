@@ -14,6 +14,7 @@ import { getCategoryIcon } from "@/lib/utils";
 import SkeletonLoader from "@/components/SkeletonLoader";
 import StateView from "@/components/StateView";
 import SectionHeader from "@/components/SectionHeader";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 import {
   BorderRadius,
   Colors,
@@ -30,9 +31,9 @@ export default function CategoriesScreen() {
     <SafeAreaView style={styles.container} edges={["top"]}>
       <View style={styles.header}>
         <Text style={styles.eyebrow}>Kategoriler</Text>
-        <Text style={styles.title}>Sirket adini bilmesen de dogru yola cik.</Text>
+        <Text style={styles.title}>Şirket adını bilmesen de doğru yola çık.</Text>
         <Text style={styles.subtitle}>
-          Sektore gore kesfet, sonra en hizli temas kanalina ilerle.
+          Sektöre göre keşfet, sonra en hızlı temas kanalına ilerle.
         </Text>
       </View>
 
@@ -41,9 +42,9 @@ export default function CategoriesScreen() {
           <Ionicons name="layers-outline" size={20} color={Colors.accent} />
         </View>
         <View style={styles.heroText}>
-          <Text style={styles.heroTitle}>Trend kategoriler ve tum sektorler</Text>
+          <Text style={styles.heroTitle}>Trend kategoriler ve tüm sektörler</Text>
           <Text style={styles.heroSubtitle}>
-            Her kategori seni ilgili firma listesine ve en iyi sonraki aksiyona tasir.
+            Her kategori seni ilgili firma listesine ve en iyi sonraki aksiyona taşır.
           </Text>
         </View>
       </View>
@@ -59,8 +60,8 @@ export default function CategoriesScreen() {
           showsVerticalScrollIndicator={false}
         >
           <SectionHeader
-            title="Tum kategoriler"
-            subtitle={`${categories?.length || 0} sektor hazir`}
+            title="Tüm kategoriler"
+            subtitle={`${categories?.length || 0} sektör hazır`}
           />
           {categories?.map((category, index) => {
             const iconName = getCategoryIcon(category.icon);
@@ -70,13 +71,17 @@ export default function CategoriesScreen() {
                 key={category.id}
                 style={styles.categoryCard}
                 activeOpacity={0.7}
-                onPress={() =>
+                onPress={() => {
+                  void trackAnalyticsEvent({
+                    event_name: "category_opened",
+                    source_screen: "/categories",
+                    category_id: category.id,
+                    metadata: { category_name: category.name },
+                  });
                   router.push(
-                    `/category/${category.id}?name=${encodeURIComponent(
-                      category.name
-                    )}`
-                  )
-                }
+                    `/category/${category.id}?name=${encodeURIComponent(category.name)}`
+                  );
+                }}
               >
                 <View style={styles.categoryIconContainer}>
                   <Ionicons
@@ -87,7 +92,7 @@ export default function CategoriesScreen() {
                 </View>
                 <View style={styles.categoryInfo}>
                   <Text style={styles.categoryName}>{category.name}</Text>
-                  <Text style={styles.categoryMeta}>Firmalari ve temas yontemlerini gor</Text>
+                  <Text style={styles.categoryMeta}>Firmaları ve temas yöntemlerini gör</Text>
                 </View>
                 <View style={styles.categoryArrow}>
                   <Ionicons
@@ -103,8 +108,8 @@ export default function CategoriesScreen() {
             <StateView
               compact
               icon="grid-outline"
-              title="Kategori bulunamadi"
-              subtitle="Icerik yenilenirken kisa bir sure beklemeniz gerekebilir."
+              title="Kategori bulunamadı"
+              subtitle="İçerik yenilenirken kısa bir süre beklemeniz gerekebilir."
             />
           ) : null}
           <View style={{ height: 24 }} />

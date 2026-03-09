@@ -19,16 +19,16 @@ export default function SavedScreen() {
       >
         <View style={styles.header}>
           <Text style={styles.eyebrow}>Kaydedilenler</Text>
-          <Text style={styles.title}>Tekrar baktiklarin ve sabitlediklerin.</Text>
+          <Text style={styles.title}>Tekrar baktıkların ve sabitlediklerin.</Text>
           <Text style={styles.subtitle}>
-            Siklikla dondugun firmalari burada hazir tut.
+            Sıklıkla döndüğün firmaları burada hazır tut.
           </Text>
         </View>
 
         <View style={styles.section}>
           <SectionHeader
             title="Favoriler"
-            subtitle="Uzun sure saklamak istediklerin"
+            subtitle="Uzun süre saklamak istediklerin"
           />
           {favorites.length > 0 ? (
             favorites.map((company) => (
@@ -57,15 +57,15 @@ export default function SavedScreen() {
             <StateView
               icon="bookmark-outline"
               title="Henüz favori yok"
-              subtitle="Firma detayinda yer isareti simgesiyle favori olusturabilirsiniz."
+              subtitle="Firma detayında yer işareti simgesiyle favori oluşturabilirsiniz."
             />
           )}
         </View>
 
         <View style={styles.section}>
           <SectionHeader
-            title="Son goruntulenenler"
-            subtitle="Hizli geri donus icin tutulur"
+            title="Son görüntülenenler"
+            subtitle="Hızlı geri dönüş için tutulur"
           />
           {recents.length > 0 ? (
             recents.map((company) => (
@@ -93,8 +93,8 @@ export default function SavedScreen() {
           ) : isLoading ? null : (
             <StateView
               icon="time-outline"
-              title="Henüz gecmis yok"
-              subtitle="Ziyaret ettigin firma profilleri burada listelenecek."
+              title="Henüz geçmiş yok"
+              subtitle="Ziyaret ettiğin firma profilleri burada listelenecek."
             />
           )}
         </View>

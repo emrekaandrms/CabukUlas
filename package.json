@@ -6,7 +6,10 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "admin:dev": "npm --prefix admin-web run dev",
+    "admin:build": "npm --prefix admin-web run build",
+    "admin:typecheck": "npm --prefix admin-web run typecheck"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
