@@ -1,6 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Linking } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Linking, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import {
+  BorderRadius,
+  Colors,
+  Shadows,
+  Typography,
+} from "@/constants/theme";
 
 interface CargoTrackerProps {
   companyName: string;
@@ -17,60 +23,120 @@ export default function CargoTracker({ companyName, trackingUrl }: CargoTrackerP
   };
 
   return (
-    <View style={{
-      backgroundColor: "#FFFFFF",
-      borderRadius: 16,
-      padding: 16,
-      marginHorizontal: 16,
-      marginTop: 16,
-      borderWidth: 1,
-      borderColor: "#F0F0EB",
-    }}>
-      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
-        <Ionicons name="cube-outline" size={18} color="#1A1A1A" />
-        <Text style={{ fontSize: 14, fontWeight: "600", color: "#1A1A1A", marginLeft: 8 }}>
-          Kargo Takip
-        </Text>
+    <View style={styles.card}>
+      <View style={styles.header}>
+        <View style={styles.headerIcon}>
+          <Ionicons name="cube-outline" size={18} color={Colors.text} />
+        </View>
+        <View>
+          <Text style={styles.title}>Kargo Takip</Text>
+          <Text style={styles.subtitle}>
+            {companyName} resmi takip sayfasina guvenli gecis
+          </Text>
+        </View>
       </View>
 
-      <Text style={{ fontSize: 12, color: "#8E8E93", marginBottom: 12 }}>
-        {companyName} resmi sitesinden takip edin
-      </Text>
+      <View style={styles.noteRow}>
+        <Ionicons
+          name="shield-checkmark-outline"
+          size={12}
+          color={Colors.textSecondary}
+        />
+        <Text style={styles.noteText}>Takip kodunuz yalnizca resmi baglantiya aktarilir</Text>
+      </View>
 
-      <View style={{ flexDirection: "row" }}>
+      <View style={styles.inputRow}>
         <TextInput
-          style={{
-            flex: 1,
-            backgroundColor: "#F5F5F0",
-            borderRadius: 12,
-            paddingHorizontal: 14,
-            paddingVertical: 12,
-            fontSize: 14,
-            color: "#1A1A1A",
-          }}
+          style={styles.input}
           value={trackingCode}
           onChangeText={setTrackingCode}
-          placeholder="Takip numarası..."
-          placeholderTextColor="#AEAEB2"
+          placeholder="Takip numarasi"
+          placeholderTextColor={Colors.textTertiary}
           autoCapitalize="characters"
           returnKeyType="go"
           onSubmitEditing={handleTrack}
         />
         <TouchableOpacity
-          style={{
-            marginLeft: 8,
-            borderRadius: 12,
-            paddingHorizontal: 18,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: trackingCode.trim() ? "#1A1A1A" : "#E8E8E3",
-          }}
+          style={[
+            styles.trackButton,
+            !trackingCode.trim() && styles.trackButtonDisabled,
+          ]}
           onPress={handleTrack}
           disabled={!trackingCode.trim()}
+          activeOpacity={0.7}
         >
-          <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+          <Ionicons name="arrow-forward" size={18} color={Colors.textInverse} />
         </TouchableOpacity>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.lg,
+    padding: 20,
+    marginHorizontal: 20,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    ...Shadows.small,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  headerIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: Colors.accentLight,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  title: {
+    ...Typography.bodyStrong,
+  },
+  subtitle: {
+    ...Typography.meta,
+    marginTop: 2,
+  },
+  noteRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 14,
+  },
+  noteText: {
+    ...Typography.micro,
+    color: Colors.textSecondary,
+    marginLeft: 5,
+  },
+  inputRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  input: {
+    flex: 1,
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+    ...Typography.bodyStrong,
+    color: Colors.text,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+  },
+  trackButton: {
+    width: 48,
+    borderRadius: BorderRadius.md,
+    backgroundColor: Colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  trackButtonDisabled: {
+    backgroundColor: Colors.border,
+  },
+});

@@ -1,5 +1,5 @@
 import { Linking } from "react-native";
-import { ChannelType, WorkingHours } from "./types";
+import { ChannelType, Company, WorkingHours } from "./types";
 
 /**
  * Kanal tipine gore Ionicons ikon ismi
@@ -138,6 +138,45 @@ export function isCurrentlyOpen(workingHours: WorkingHours | null): boolean | nu
   const endMinutes = endH * 60 + (endM || 0);
 
   return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
+}
+
+export function formatUpdatedAt(value?: string | null): string | null {
+  if (!value) return null;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  const diffMs = Date.now() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays <= 0) return "Bugün güncellendi";
+  if (diffDays === 1) return "Dün güncellendi";
+  if (diffDays < 7) return `${diffDays} gün önce güncellendi`;
+
+  return `Son güncelleme ${date.toLocaleDateString("tr-TR")}`;
+}
+
+export function getCompanyFastestChannel(company: Company): ChannelType | null {
+  return company.contact_channels?.find((channel) => channel.is_fastest)?.channel_type || null;
+}
+
+export function getCompanyTrustSignals(company: Company): string[] {
+  const signals: string[] = [];
+
+  if (company.contact_channels?.some((channel) => channel.is_fastest)) {
+    signals.push("Önerilen kanal");
+  }
+
+  if (company.has_cargo_tracking) {
+    signals.push("Resmi takip");
+  }
+
+  const updatedLabel = formatUpdatedAt(company.updated_at);
+  if (updatedLabel) {
+    signals.push(updatedLabel);
+  }
+
+  return signals.slice(0, 2);
 }
 
 /**

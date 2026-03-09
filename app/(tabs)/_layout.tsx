@@ -1,25 +1,29 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { BorderRadius, Colors, Shadows } from "@/constants/theme";
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#1A1A1A",
-        tabBarInactiveTintColor: "#AEAEB2",
+        tabBarActiveTintColor: Colors.text,
+        tabBarInactiveTintColor: Colors.textTertiary,
         tabBarStyle: {
-          backgroundColor: "#FFFFFF",
-          borderTopWidth: 0.5,
-          borderTopColor: "#E8E8E3",
-          paddingBottom: 6,
-          paddingTop: 6,
-          height: 56,
-          elevation: 0,
-          shadowOpacity: 0,
+          backgroundColor: Colors.surface,
+          borderTopWidth: 0,
+          height: 72,
+          paddingBottom: 12,
+          paddingTop: 10,
+          marginHorizontal: 12,
+          marginBottom: 10,
+          borderRadius: BorderRadius.xl,
+          position: "absolute",
+          ...Shadows.tabBar,
         },
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: "600",
+          letterSpacing: 0.1,
         },
         headerShown: false,
       }}
@@ -27,9 +31,26 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Keşfet",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="search" size={22} color={color} />
+          title: "Ana Sayfa",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "sparkles" : "sparkles-outline"}
+              size={22}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="search"
+        options={{
+          title: "Ara",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "search" : "search-outline"}
+              size={22}
+              color={color}
+            />
           ),
         }}
       />
@@ -37,8 +58,25 @@ export default function TabLayout() {
         name="categories"
         options={{
           title: "Kategoriler",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="grid-outline" size={22} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "grid" : "grid-outline"}
+              size={22}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="saved"
+        options={{
+          title: "Kaydedilenler",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "bookmark" : "bookmark-outline"}
+              size={21}
+              color={color}
+            />
           ),
         }}
       />

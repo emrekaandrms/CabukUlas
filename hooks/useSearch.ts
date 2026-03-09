@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState, useCallback } from "react";
 import { searchCompanies } from "@/lib/api";
+import { normalizeText } from "@/lib/utils";
 
 export function useSearch() {
   const [query, setQuery] = useState("");
@@ -43,8 +44,10 @@ export function useSearch() {
     query,
     updateQuery,
     clearSearch,
+    normalizedQuery: normalizeText(query),
     results: results.data || [],
     isSearching: results.isLoading,
+    error: results.error,
     isActive: query.length >= 2,
   };
 }

@@ -1,5 +1,6 @@
 import { supabase } from "./supabase";
 import { Category, Company, CompanyWithChannels, ContactChannel } from "./types";
+import { normalizeText } from "./utils";
 
 /**
  * Tum kategorileri getir
@@ -59,6 +60,7 @@ export async function fetchCompanyBySlug(slug: string): Promise<CompanyWithChann
 export async function searchCompanies(query: string): Promise<Company[]> {
   const searchTerm = query.trim();
   if (!searchTerm) return [];
+  const normalizedQuery = normalizeText(searchTerm);
 
   const { data, error } = await supabase
     .from("companies")
@@ -68,11 +70,31 @@ export async function searchCompanies(query: string): Promise<Company[]> {
       contact_channels(*)
     `)
     .ilike("name", `%${searchTerm}%`)
-    .order("name", { ascending: true })
-    .limit(20);
+    .limit(40);
 
   if (error) throw error;
-  return data || [];
+  return (data || []).sort((a, b) => {
+    const aName = normalizeText(a.name);
+    const bName = normalizeText(b.name);
+
+    const aExact = aName === normalizedQuery ? 1 : 0;
+    const bExact = bName === normalizedQuery ? 1 : 0;
+    if (aExact !== bExact) return bExact - aExact;
+
+    const aPrefix = aName.startsWith(normalizedQuery) ? 1 : 0;
+    const bPrefix = bName.startsWith(normalizedQuery) ? 1 : 0;
+    if (aPrefix !== bPrefix) return bPrefix - aPrefix;
+
+    const aFastest = a.contact_channels?.some((channel: ContactChannel) => channel.is_fastest)
+      ? 1
+      : 0;
+    const bFastest = b.contact_channels?.some((channel: ContactChannel) => channel.is_fastest)
+      ? 1
+      : 0;
+    if (aFastest !== bFastest) return bFastest - aFastest;
+
+    return a.name.localeCompare(b.name, "tr");
+  });
 }
 
 /**
@@ -86,8 +108,8 @@ export async function fetchPopularCompanies(): Promise<Company[]> {
       category:categories(*),
       contact_channels(*)
     `)
-    .order("name", { ascending: true })
-    .limit(10);
+    .order("updated_at", { ascending: false })
+    .limit(12);
 
   if (error) throw error;
   return data || [];

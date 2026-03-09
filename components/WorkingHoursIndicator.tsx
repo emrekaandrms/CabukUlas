@@ -1,36 +1,76 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { WorkingHours } from "@/lib/types";
 import { isCurrentlyOpen } from "@/lib/utils";
+import { BorderRadius, Colors, Typography } from "@/constants/theme";
 
 interface WorkingHoursIndicatorProps {
   workingHours: WorkingHours;
+  light?: boolean;
 }
 
-export default function WorkingHoursIndicator({ workingHours }: WorkingHoursIndicatorProps) {
+export default function WorkingHoursIndicator({ workingHours, light }: WorkingHoursIndicatorProps) {
   const isOpen = isCurrentlyOpen(workingHours);
+  const activeHours = workingHours.weekend || workingHours.weekdays;
 
   if (isOpen === null) return null;
 
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
+    <View style={styles.row}>
       <View
-        style={{
-          width: 6,
-          height: 6,
-          borderRadius: 3,
-          backgroundColor: isOpen ? "#34C759" : "#FF3B30",
-          marginRight: 5,
-        }}
+        style={[
+          styles.dot,
+          { backgroundColor: isOpen ? Colors.success : Colors.danger },
+        ]}
       />
-      <Text style={{ fontSize: 11, color: isOpen ? "#34C759" : "#FF3B30", fontWeight: "500" }}>
-        {isOpen ? "Açık" : "Kapalı"}
+      <Text
+        style={[
+          styles.status,
+          {
+            color: light
+              ? "rgba(255,255,255,0.9)"
+              : isOpen
+                ? Colors.success
+                : Colors.danger,
+          },
+        ]}
+      >
+        Su an {isOpen ? "acik" : "kapali"}
       </Text>
-      {workingHours.weekdays && (
-        <Text style={{ fontSize: 11, color: "#AEAEB2", marginLeft: 4 }}>
-          {workingHours.weekdays}
+      {activeHours && (
+        <Text
+          style={[
+            styles.hours,
+            {
+              color: light ? "rgba(255,255,255,0.6)" : Colors.textSecondary,
+            },
+          ]}
+        >
+          {activeHours}
         </Text>
       )}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 6,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: BorderRadius.full,
+    marginRight: 6,
+  },
+  status: {
+    ...Typography.micro,
+    fontWeight: "700",
+  },
+  hours: {
+    ...Typography.micro,
+    marginLeft: 6,
+  },
+});

@@ -1,6 +1,7 @@
 import React from "react";
-import { View, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, TextInput, TouchableOpacity, ActivityIndicator, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { BorderRadius, Colors, Shadows, Spacing, Typography } from "@/constants/theme";
 
 interface SearchBarProps {
   value: string;
@@ -10,39 +11,78 @@ interface SearchBarProps {
   autoFocus?: boolean;
 }
 
-export default function SearchBar({ value, onChangeText, onClear, isSearching, autoFocus }: SearchBarProps) {
+export default function SearchBar({
+  value,
+  onChangeText,
+  onClear,
+  isSearching,
+  autoFocus,
+}: SearchBarProps) {
   return (
-    <View style={{
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: "#F5F5F0",
-      borderRadius: 12,
-      paddingHorizontal: 14,
-      height: 44,
-    }}>
-      <Ionicons name="search" size={18} color="#AEAEB2" />
+    <View style={styles.container}>
+      <View style={styles.iconWrap}>
+        <Ionicons name="search" size={17} color={Colors.textSecondary} />
+      </View>
       <TextInput
-        style={{
-          flex: 1,
-          marginLeft: 10,
-          fontSize: 15,
-          color: "#1A1A1A",
-          paddingVertical: 0,
-        }}
+        style={styles.input}
         value={value}
         onChangeText={onChangeText}
-        placeholder="Firma adı yazın..."
-        placeholderTextColor="#AEAEB2"
+        placeholder="Firma, marka veya hizmet ara"
+        placeholderTextColor={Colors.textSecondary}
         autoFocus={autoFocus}
         returnKeyType="search"
         autoCorrect={false}
+        autoCapitalize="none"
+        selectionColor={Colors.accent}
       />
-      {isSearching && <ActivityIndicator size="small" color="#8E8E93" style={{ marginRight: 8 }} />}
+      {isSearching && (
+        <ActivityIndicator
+          size="small"
+          color={Colors.accent}
+          style={{ marginRight: Spacing.xs }}
+        />
+      )}
       {value.length > 0 && !isSearching && (
-        <TouchableOpacity onPress={onClear} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-          <Ionicons name="close-circle" size={18} color="#AEAEB2" />
+        <TouchableOpacity
+          onPress={onClear}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          style={styles.clearButton}
+        >
+          <Ionicons name="close-circle-outline" size={18} color={Colors.textTertiary} />
         </TouchableOpacity>
       )}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.lg,
+    paddingHorizontal: 8,
+    height: 56,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    ...Shadows.small,
+  },
+  iconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: BorderRadius.sm,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: Colors.surfaceSecondary,
+  },
+  input: {
+    flex: 1,
+    ...Typography.bodyStrong,
+    marginLeft: 10,
+    color: Colors.text,
+    paddingVertical: 0,
+  },
+  clearButton: {
+    padding: 6,
+  },
+});

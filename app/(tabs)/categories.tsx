@@ -1,71 +1,212 @@
 import React from "react";
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useCategories } from "@/hooks/useCategories";
 import { getCategoryIcon } from "@/lib/utils";
+import SkeletonLoader from "@/components/SkeletonLoader";
+import StateView from "@/components/StateView";
+import SectionHeader from "@/components/SectionHeader";
+import {
+  BorderRadius,
+  Colors,
+  Shadows,
+  Spacing,
+  Typography,
+} from "@/constants/theme";
 
 export default function CategoriesScreen() {
   const router = useRouter();
   const { data: categories, isLoading } = useCategories();
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F5F0" }} edges={["top"]}>
-      <View style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 16 }}>
-        <Text style={{ fontSize: 28, fontWeight: "800", color: "#1A1A1A", letterSpacing: -0.5 }}>
-          Kategoriler
-        </Text>
-        <Text style={{ fontSize: 14, color: "#8E8E93", marginTop: 2 }}>
-          Sektöre göre firmalar
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      <View style={styles.header}>
+        <Text style={styles.eyebrow}>Kategoriler</Text>
+        <Text style={styles.title}>Sirket adini bilmesen de dogru yola cik.</Text>
+        <Text style={styles.subtitle}>
+          Sektore gore kesfet, sonra en hizli temas kanalina ilerle.
         </Text>
       </View>
 
+      <View style={styles.heroCard}>
+        <View style={styles.heroIcon}>
+          <Ionicons name="layers-outline" size={20} color={Colors.accent} />
+        </View>
+        <View style={styles.heroText}>
+          <Text style={styles.heroTitle}>Trend kategoriler ve tum sektorler</Text>
+          <Text style={styles.heroSubtitle}>
+            Her kategori seni ilgili firma listesine ve en iyi sonraki aksiyona tasir.
+          </Text>
+        </View>
+      </View>
+
       {isLoading ? (
-        <ActivityIndicator size="large" color="#1A1A1A" style={{ marginTop: 48 }} />
+        <View style={{ paddingTop: 16 }}>
+          <SkeletonLoader type="cards" count={6} />
+        </View>
       ) : (
-        <ScrollView style={{ flex: 1, paddingHorizontal: 16 }} showsVerticalScrollIndicator={false}>
-          {categories?.map((category) => {
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <SectionHeader
+            title="Tum kategoriler"
+            subtitle={`${categories?.length || 0} sektor hazir`}
+          />
+          {categories?.map((category, index) => {
             const iconName = getCategoryIcon(category.icon);
 
             return (
               <TouchableOpacity
                 key={category.id}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  backgroundColor: "#FFFFFF",
-                  borderRadius: 16,
-                  padding: 16,
-                  marginBottom: 8,
-                  borderWidth: 1,
-                  borderColor: "#F0F0EB",
-                }}
-                activeOpacity={0.6}
+                style={styles.categoryCard}
+                activeOpacity={0.7}
                 onPress={() =>
-                  router.push(`/category/${category.id}?name=${encodeURIComponent(category.name)}`)
+                  router.push(
+                    `/category/${category.id}?name=${encodeURIComponent(
+                      category.name
+                    )}`
+                  )
                 }
               >
-                <View style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 14,
-                  backgroundColor: "#F5F5F0",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}>
-                  <Ionicons name={iconName as any} size={24} color="#1A1A1A" />
+                <View style={styles.categoryIconContainer}>
+                  <Ionicons
+                    name={iconName as any}
+                    size={22}
+                    color={Colors.accent}
+                  />
                 </View>
-                <Text style={{ flex: 1, fontSize: 16, fontWeight: "600", color: "#1A1A1A", marginLeft: 14 }}>
-                  {category.name}
-                </Text>
-                <Ionicons name="chevron-forward" size={18} color="#AEAEB2" />
+                <View style={styles.categoryInfo}>
+                  <Text style={styles.categoryName}>{category.name}</Text>
+                  <Text style={styles.categoryMeta}>Firmalari ve temas yontemlerini gor</Text>
+                </View>
+                <View style={styles.categoryArrow}>
+                  <Ionicons
+                    name="chevron-forward"
+                    size={16}
+                    color={Colors.textTertiary}
+                  />
+                </View>
               </TouchableOpacity>
             );
           })}
+          {categories?.length === 0 ? (
+            <StateView
+              compact
+              icon="grid-outline"
+              title="Kategori bulunamadi"
+              subtitle="Icerik yenilenirken kisa bir sure beklemeniz gerekebilir."
+            />
+          ) : null}
           <View style={{ height: 24 }} />
         </ScrollView>
       )}
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  header: {
+    paddingHorizontal: Spacing.screenPadding,
+    paddingTop: 16,
+    paddingBottom: 16,
+  },
+  eyebrow: {
+    ...Typography.micro,
+    color: Colors.accent,
+    textTransform: "uppercase",
+  },
+  title: {
+    ...Typography.screenTitle,
+    marginTop: 8,
+  },
+  subtitle: {
+    ...Typography.body,
+    marginTop: 8,
+  },
+  heroCard: {
+    flexDirection: "row",
+    marginHorizontal: Spacing.screenPadding,
+    marginBottom: Spacing.lg,
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.xl,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    ...Shadows.small,
+  },
+  heroIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: BorderRadius.md,
+    backgroundColor: Colors.accentLight,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  heroText: {
+    flex: 1,
+  },
+  heroTitle: {
+    ...Typography.bodyStrong,
+  },
+  heroSubtitle: {
+    ...Typography.meta,
+    marginTop: 4,
+  },
+  listContent: {
+    paddingHorizontal: Spacing.screenPadding,
+    paddingBottom: 24,
+  },
+  categoryCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.lg,
+    padding: 18,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    ...Shadows.small,
+  },
+  categoryIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: Colors.accentLight,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  categoryInfo: {
+    flex: 1,
+    marginLeft: 16,
+  },
+  categoryName: {
+    ...Typography.bodyStrong,
+  },
+  categoryMeta: {
+    ...Typography.meta,
+    marginTop: 4,
+  },
+  categoryArrow: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.surfaceSecondary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});

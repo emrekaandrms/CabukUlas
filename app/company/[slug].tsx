@@ -1,149 +1,357 @@
-import React from "react";
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Image, Linking } from "react-native";
+import React, { useEffect } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Linking,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useCompany } from "@/hooks/useCompany";
+import { useQuickAccess } from "@/hooks/useQuickAccess";
 import ContactChannelItem from "@/components/ContactChannelItem";
 import CargoTracker from "@/components/CargoTracker";
+import SkeletonLoader from "@/components/SkeletonLoader";
+import StateView from "@/components/StateView";
+import SectionHeader from "@/components/SectionHeader";
+import { formatUpdatedAt, getCompanyTrustSignals } from "@/lib/utils";
+import {
+  BorderRadius,
+  Colors,
+  Shadows,
+  Spacing,
+  Typography,
+} from "@/constants/theme";
 
 export default function CompanyDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
+  const { addRecent, isFavorite, toggleFavorite } = useQuickAccess();
   const { data: company, isLoading, error } = useCompany(slug || "");
+
+  useEffect(() => {
+    if (company) {
+      addRecent(company);
+    }
+  }, [addRecent, company]);
 
   if (isLoading) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F5F0", alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator size="large" color="#1A1A1A" />
+      <SafeAreaView style={styles.container} edges={["top"]}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.headerBtn}>
+            <Ionicons name="chevron-back" size={22} color={Colors.text} />
+          </TouchableOpacity>
+        </View>
+        <SkeletonLoader type="detail" />
       </SafeAreaView>
     );
   }
 
   if (error || !company) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F5F0", alignItems: "center", justifyContent: "center", paddingHorizontal: 32 }}>
-        <Ionicons name="alert-circle-outline" size={56} color="#AEAEB2" />
-        <Text style={{ fontSize: 17, fontWeight: "600", color: "#48484A", marginTop: 16, textAlign: "center" }}>
-          Firma bulunamadı
-        </Text>
-        <TouchableOpacity
-          style={{ marginTop: 16, backgroundColor: "#1A1A1A", paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 }}
-          onPress={() => router.back()}
-        >
-          <Text style={{ color: "#FFFFFF", fontWeight: "600" }}>Geri Dön</Text>
-        </TouchableOpacity>
+      <SafeAreaView style={styles.container} edges={["top"]}>
+        <StateView
+          icon="alert-circle-outline"
+          title="Firma bulunamadi"
+          subtitle="Bu profil kaldirilmis olabilir veya baglanti su anda ulasilamiyor."
+          actionLabel="Geri don"
+          onPressAction={() => router.back()}
+        />
       </SafeAreaView>
     );
   }
 
   const channels = company.contact_channels || [];
-  const fastestChannel = channels.find((c) => c.is_fastest);
-  const otherChannels = channels.filter((c) => !c.is_fastest);
+  const fastestChannel = channels.find((channel) => channel.is_fastest);
+  const otherChannels = channels.filter((channel) => !channel.is_fastest);
+  const favorite = isFavorite(company.id);
+  const trustSignals = getCompanyTrustSignals(company);
+  const updatedAt = formatUpdatedAt(company.updated_at);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F5F0" }} edges={["top"]}>
-      {/* Header */}
-      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingVertical: 12 }}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
-          style={{ padding: 4 }}
+          style={styles.headerBtn}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons name="arrow-back" size={24} color="#1A1A1A" />
+          <Ionicons name="chevron-back" size={22} color={Colors.text} />
         </TouchableOpacity>
-        <Text style={{ flex: 1, fontSize: 17, fontWeight: "600", color: "#1A1A1A", marginLeft: 12 }} numberOfLines={1}>
-          {company.name}
-        </Text>
-        {company.website_url && (
-          <TouchableOpacity onPress={() => Linking.openURL(company.website_url!)} style={{ padding: 4 }}>
-            <Ionicons name="globe-outline" size={22} color="#8E8E93" />
+
+        <View style={styles.headerActions}>
+          {company.website_url ? (
+            <TouchableOpacity
+              onPress={() => Linking.openURL(company.website_url!)}
+              style={styles.headerBtn}
+            >
+              <Ionicons name="globe-outline" size={20} color={Colors.textSecondary} />
+            </TouchableOpacity>
+          ) : null}
+          <TouchableOpacity
+            onPress={() => toggleFavorite(company)}
+            style={styles.headerBtn}
+          >
+            <Ionicons
+              name={favorite ? "bookmark" : "bookmark-outline"}
+              size={20}
+              color={favorite ? Colors.accent : Colors.textSecondary}
+            />
           </TouchableOpacity>
-        )}
+        </View>
       </View>
 
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-        {/* Company info */}
-        <View style={{ alignItems: "center", paddingTop: 8, paddingBottom: 24, paddingHorizontal: 20 }}>
-          <View style={{
-            width: 72,
-            height: 72,
-            borderRadius: 20,
-            backgroundColor: "#FFFFFF",
-            alignItems: "center",
-            justifyContent: "center",
-            borderWidth: 1,
-            borderColor: "#E8E8E3",
-            overflow: "hidden",
-          }}>
+        <View style={styles.hero}>
+          <View style={styles.heroLogoWrap}>
             {company.logo_url ? (
-              <Image source={{ uri: company.logo_url }} style={{ width: 72, height: 72 }} resizeMode="contain" />
+              <Image
+                source={{ uri: company.logo_url }}
+                style={styles.heroLogoImg}
+                resizeMode="contain"
+              />
             ) : (
-              <Text style={{ fontSize: 28, fontWeight: "800", color: "#1A1A1A" }}>
-                {company.name.charAt(0)}
-              </Text>
+              <Text style={styles.heroLogoText}>{company.name.charAt(0)}</Text>
             )}
           </View>
-          <Text style={{ fontSize: 22, fontWeight: "700", color: "#1A1A1A", marginTop: 12 }}>
-            {company.name}
-          </Text>
-          {company.category && (
-            <Text style={{ fontSize: 14, color: "#8E8E93", marginTop: 4 }}>
-              {company.category.name}
-            </Text>
-          )}
-          {company.description && (
-            <Text style={{ fontSize: 13, color: "#8E8E93", marginTop: 6, textAlign: "center" }}>
-              {company.description}
-            </Text>
-          )}
-        </View>
 
-        {/* Fastest Channel */}
-        {fastestChannel && (
-          <View style={{ paddingHorizontal: 16, marginBottom: 8 }}>
-            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
-              <Ionicons name="flash" size={16} color="#FF6B35" />
-              <Text style={{ fontSize: 15, fontWeight: "700", color: "#FF6B35", marginLeft: 6 }}>
-                En Hızlı Yol
-              </Text>
+          <Text style={styles.heroName}>{company.name}</Text>
+
+          {company.category ? (
+            <View style={styles.heroCategoryPill}>
+              <Text style={styles.heroCategoryText}>{company.category.name}</Text>
             </View>
-            <ContactChannelItem channel={fastestChannel} />
-          </View>
-        )}
+          ) : null}
 
-        {/* Other Channels */}
-        {otherChannels.length > 0 && (
-          <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
-            <Text style={{ fontSize: 15, fontWeight: "700", color: "#1A1A1A", marginBottom: 10 }}>
-              Tüm İletişim Kanalları
-            </Text>
-            {otherChannels.map((channel) => (
-              <ContactChannelItem key={channel.id} channel={channel} />
+          <Text style={styles.heroDesc}>
+            {company.description ||
+              "Bu profil, en dogru temas kanalina hizla gecmeniz icin hazirlandi."}
+          </Text>
+
+          <View style={styles.signalRow}>
+            {trustSignals.map((signal) => (
+              <View key={signal} style={styles.signalPill}>
+                <Text style={styles.signalText}>{signal}</Text>
+              </View>
             ))}
           </View>
-        )}
+        </View>
 
-        {/* Cargo */}
-        {company.has_cargo_tracking && company.cargo_tracking_url && (
-          <CargoTracker companyName={company.name} trackingUrl={company.cargo_tracking_url} />
-        )}
+        {fastestChannel ? (
+          <View style={styles.section}>
+            <SectionHeader
+              title="Onerilen sonraki adim"
+              subtitle="En hizli iletisim yolu burada one cikiyor"
+              icon="flash"
+            />
+            <ContactChannelItem channel={fastestChannel} prominent />
+          </View>
+        ) : null}
 
-        {/* Source */}
-        {company.website_url && (
-          <TouchableOpacity
-            style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", paddingVertical: 20, marginTop: 8 }}
-            onPress={() => Linking.openURL(company.website_url!)}
-          >
-            <Ionicons name="information-circle-outline" size={14} color="#AEAEB2" />
-            <Text style={{ fontSize: 11, color: "#AEAEB2", marginLeft: 4 }}>
-              Bilgiler resmi kaynaktan derlenmiştir
-            </Text>
-          </TouchableOpacity>
-        )}
+        {otherChannels.length > 0 ? (
+          <View style={styles.section}>
+            <SectionHeader
+              title="Alternatif temas kanallari"
+              subtitle="Durumunuza gore farkli bir yol secin"
+            />
+            <View style={styles.sectionBody}>
+              {otherChannels.map((channel) => (
+                <ContactChannelItem key={channel.id} channel={channel} />
+              ))}
+            </View>
+          </View>
+        ) : null}
 
-        <View style={{ height: 24 }} />
+        {company.has_cargo_tracking && company.cargo_tracking_url ? (
+          <View style={styles.section}>
+            <SectionHeader
+              title="Kargo takibi"
+              subtitle="Resmi takip baglantisina dogrudan gecis"
+            />
+            <CargoTracker
+              companyName={company.name}
+              trackingUrl={company.cargo_tracking_url}
+            />
+          </View>
+        ) : null}
+
+        <View style={styles.section}>
+          <SectionHeader
+            title="Guven ve kaynak"
+            subtitle="Bilginin nereden geldigi gorunur olsun"
+          />
+          <View style={styles.infoCard}>
+            <View style={styles.infoRow}>
+              <Ionicons
+                name="shield-checkmark-outline"
+                size={16}
+                color={Colors.textSecondary}
+              />
+              <Text style={styles.infoText}>
+                Kanallar resmi kaynak baglantilariyla derlenir ve gozden gecirilir.
+              </Text>
+            </View>
+            {updatedAt ? (
+              <View style={styles.infoRow}>
+                <Ionicons name="time-outline" size={16} color={Colors.textSecondary} />
+                <Text style={styles.infoText}>{updatedAt}</Text>
+              </View>
+            ) : null}
+            {company.website_url ? (
+              <TouchableOpacity
+                style={styles.inlineAction}
+                activeOpacity={0.75}
+                onPress={() => Linking.openURL(company.website_url!)}
+              >
+                <Text style={styles.inlineActionText}>Resmi siteyi ac</Text>
+                <Ionicons name="open-outline" size={16} color={Colors.accent} />
+              </TouchableOpacity>
+            ) : null}
+          </View>
+        </View>
+
+        <View style={{ height: 120 }} />
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  headerActions: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  headerBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: Colors.border,
+    ...Shadows.subtle,
+  },
+  hero: {
+    alignItems: "center",
+    paddingTop: 6,
+    paddingBottom: 26,
+    paddingHorizontal: Spacing.screenPadding,
+  },
+  heroLogoWrap: {
+    width: 96,
+    height: 96,
+    borderRadius: BorderRadius.xxl,
+    backgroundColor: Colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: Colors.border,
+    ...Shadows.medium,
+  },
+  heroLogoImg: {
+    width: 96,
+    height: 96,
+  },
+  heroLogoText: {
+    ...Typography.display,
+    color: Colors.text,
+  },
+  heroName: {
+    ...Typography.display,
+    marginTop: 16,
+    textAlign: "center",
+  },
+  heroCategoryPill: {
+    marginTop: 10,
+    backgroundColor: Colors.surfaceSecondary,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: BorderRadius.capsule,
+  },
+  heroCategoryText: {
+    ...Typography.meta,
+    color: Colors.text,
+  },
+  heroDesc: {
+    ...Typography.body,
+    textAlign: "center",
+    marginTop: 14,
+    maxWidth: "92%",
+  },
+  signalRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    justifyContent: "center",
+    marginTop: 18,
+  },
+  signalPill: {
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.capsule,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  signalText: {
+    ...Typography.micro,
+    color: Colors.textSecondary,
+  },
+  section: {
+    marginBottom: 26,
+  },
+  sectionBody: {
+    paddingHorizontal: Spacing.screenPadding,
+  },
+  infoCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.xl,
+    marginHorizontal: Spacing.screenPadding,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    ...Shadows.small,
+  },
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 12,
+  },
+  infoText: {
+    ...Typography.body,
+    color: Colors.textSecondary,
+    marginLeft: 10,
+    flex: 1,
+  },
+  inlineAction: {
+    marginTop: 6,
+    paddingTop: 14,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: Colors.borderLight,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  inlineActionText: {
+    ...Typography.bodyStrong,
+    color: Colors.accent,
+  },
+});
