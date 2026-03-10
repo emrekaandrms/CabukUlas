@@ -1,4 +1,5 @@
 import { PropsWithChildren, ReactNode } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface SectionCardProps extends PropsWithChildren {
   title: string;
@@ -13,15 +14,15 @@ export default function SectionCard({
   children,
 }: SectionCardProps) {
   return (
-    <section className="sectionCard">
-      <div className="sectionCardHeader">
+    <Card className="sectionCard">
+      <CardHeader className="sectionCardHeader">
         <div>
-          <h2>{title}</h2>
-          {description ? <p>{description}</p> : null}
+          <CardTitle>{title}</CardTitle>
+          {description ? <CardDescription>{description}</CardDescription> : null}
         </div>
         {action}
-      </div>
-      <div className="sectionCardBody">{children}</div>
-    </section>
+      </CardHeader>
+      <CardContent className="sectionCardBody">{children}</CardContent>
+    </Card>
   );
 }

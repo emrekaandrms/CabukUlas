@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface Column<T> {
   key: string;
@@ -23,24 +24,24 @@ export default function DataTable<T>({
 
   return (
     <div className="tableWrap">
-      <table className="dataTable">
-        <thead>
-          <tr>
+      <Table className="dataTable">
+        <TableHeader>
+          <TableRow>
             {columns.map((column) => (
-              <th key={column.key}>{column.header}</th>
+              <TableHead key={column.key}>{column.header}</TableHead>
             ))}
-          </tr>
-        </thead>
-        <tbody>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {rows.map((row, index) => (
-            <tr key={index}>
+            <TableRow key={index}>
               {columns.map((column) => (
-                <td key={column.key}>{column.render(row)}</td>
+                <TableCell key={column.key}>{column.render(row)}</TableCell>
               ))}
-            </tr>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }

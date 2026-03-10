@@ -164,6 +164,13 @@ export interface SearchInsightRow {
   no_result_count: number;
 }
 
+export interface CsvImportResult {
+  created: number;
+  updated: number;
+  skipped: number;
+  errors: string[];
+}
+
 export interface OverviewMetrics {
   pendingReview: number;
   needsVerification: number;

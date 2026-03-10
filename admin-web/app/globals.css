@@ -1,16 +1,60 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted-bg);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+}
+
 :root {
   color-scheme: light;
-  --bg: #f6f3ee;
-  --surface: #ffffff;
-  --surface-soft: #fbf8f3;
-  --border: #e7dfd2;
-  --text: #18181b;
-  --muted: #686471;
+  --background: #f6f3ee;
+  --foreground: #18181b;
+  --card: #ffffff;
+  --card-foreground: #18181b;
+  --popover: #ffffff;
+  --popover-foreground: #18181b;
+  --primary: #18181b;
+  --primary-foreground: #ffffff;
+  --secondary: #fbf8f3;
+  --secondary-foreground: #18181b;
+  --muted-bg: #f3ede4;
+  --muted-foreground: #686471;
   --accent: #d9733a;
+  --accent-foreground: #ffffff;
+  --destructive: #b94f5f;
+  --border: #e7dfd2;
+  --input: #ded5c7;
+  --ring: #d9733a;
+  --radius: 1rem;
+  --bg: var(--background);
+  --surface: var(--card);
+  --surface-soft: var(--secondary);
+  --text: var(--foreground);
+  --muted: var(--muted-foreground);
   --accent-soft: #fde8dc;
   --success: #2f8a63;
   --warning: #b9771d;
-  --danger: #b94f5f;
+  --danger: var(--destructive);
 }
 
 * {
@@ -29,8 +73,9 @@ body {
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-  background: var(--bg);
-  color: var(--text);
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
 }
 
 a {
@@ -68,6 +113,10 @@ button {
   min-height: 100vh;
 }
 
+.sidebarCollapsedLayout {
+  grid-template-columns: 92px 1fr;
+}
+
 .sidebar {
   border-right: 1px solid var(--border);
   background: var(--surface-soft);
@@ -77,11 +126,31 @@ button {
   height: 100vh;
 }
 
+.mobileSidebar {
+  position: static;
+  height: 100%;
+  border-right: 0;
+  padding: 20px;
+}
+
+.collapsedSidebar {
+  padding-inline: 12px;
+}
+
+.sidebarHeader {
+  display: grid;
+  gap: 12px;
+}
+
 .brandBlock {
   padding: 14px;
   border: 1px solid var(--border);
   border-radius: 22px;
   background: var(--surface);
+}
+
+.sidebarMiniToggle {
+  width: 100%;
 }
 
 .brandBlock h1 {
@@ -111,10 +180,26 @@ button {
 }
 
 .sidebarLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 12px 14px;
   border-radius: 16px;
   color: var(--muted);
   font-weight: 600;
+}
+
+.sidebarLinkBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .sidebarLink.active,
@@ -123,8 +208,13 @@ button {
   color: var(--text);
 }
 
+.mobileSidebarTrigger {
+  display: none;
+}
+
 .appContent {
   padding: 24px;
+  min-width: 0;
 }
 
 .topbar {
@@ -133,6 +223,16 @@ button {
   align-items: center;
   gap: 16px;
   margin-bottom: 24px;
+}
+
+.topbarTitleRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.sidebarToggleButton {
+  white-space: nowrap;
 }
 
 .topbar h2 {
@@ -225,6 +325,7 @@ button {
   border-radius: 24px;
   background: var(--surface);
   padding: 20px;
+  min-width: 0;
 }
 
 .sectionCardHeader {
@@ -253,6 +354,7 @@ button {
 
 .tableWrap {
   overflow-x: auto;
+  min-width: 0;
 }
 
 .dataTable {
@@ -283,7 +385,7 @@ button {
 
 .splitGrid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: minmax(0, 1.4fr) minmax(360px, 1fr);
   gap: 20px;
 }
 
@@ -329,10 +431,84 @@ button {
   color: var(--text);
 }
 
+.readonlyField {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #f1ece3;
+  padding: 13px 14px;
+  color: var(--text);
+  font-weight: 600;
+}
+
 .field textarea,
 .fieldFull textarea {
   min-height: 120px;
   resize: vertical;
+}
+
+.formHintCard,
+.inlinePanel {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface-soft);
+  padding: 16px;
+}
+
+.formHintCard strong,
+.inlinePanel strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.formHintCard p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.formHintLabel {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.formErrorText {
+  color: var(--danger) !important;
+  font-weight: 600;
+}
+
+.inlinePanelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.inlineChipList {
+  display: grid;
+  gap: 10px;
+}
+
+.inlineEditorButton {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 12px 14px;
+  text-align: left;
+  display: grid;
+  gap: 4px;
+}
+
+.inlineEditorButton small {
+  color: var(--muted);
+}
+
+.inlineEditorButton.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .buttonRow {
@@ -347,8 +523,10 @@ button {
 .dangerButton {
   border: 0;
   border-radius: 14px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   font-weight: 700;
+  font-size: 14px;
+  line-height: 1.2;
 }
 
 .primaryButton {
@@ -365,6 +543,12 @@ button {
   background: transparent;
   color: var(--muted);
   border: 1px solid var(--border);
+}
+
+.selectedGhostButton {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .dangerButton {
@@ -400,6 +584,58 @@ button {
 
 .muted {
   color: var(--muted);
+}
+
+.channelCardList {
+  display: grid;
+  gap: 12px;
+}
+
+.channelInfoCard {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface-soft);
+  padding: 16px;
+}
+
+.channelInfoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.channelInfoHeader h3 {
+  margin: 6px 0 0;
+  font-size: 18px;
+}
+
+.channelInfoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.channelInfoLabel {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.channelInfoValue {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.45;
+}
+
+.breakWord {
+  word-break: break-word;
 }
 
 .loginCard {
@@ -442,9 +678,12 @@ button {
     grid-template-columns: 1fr;
   }
 
+  .sidebarCollapsedLayout {
+    grid-template-columns: 1fr;
+  }
+
   .sidebar {
-    position: static;
-    height: auto;
+    display: none;
   }
 
   .formGrid {
@@ -453,5 +692,31 @@ button {
 
   .pageIntro {
     flex-direction: column;
+  }
+
+  .inlinePanelHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .topbarTitleRow {
+    flex-direction: column;
+  }
+
+  .mobileSidebarTrigger {
+    display: inline-flex;
+  }
+
+  .sidebarToggleButton {
+    display: none;
+  }
+
+  .channelInfoGrid {
+    grid-template-columns: 1fr;
   }
 }

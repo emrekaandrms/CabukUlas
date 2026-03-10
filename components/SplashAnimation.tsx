@@ -5,7 +5,7 @@ import { BorderRadius, Colors, Motion, Typography } from "@/constants/theme";
 export default function SplashAnimation() {
   const logoOpacity = useRef(new Animated.Value(0)).current;
   const logoScale = useRef(new Animated.Value(0.92)).current;
-  const signalWidth = useRef(new Animated.Value(0)).current;
+  const signalScaleX = useRef(new Animated.Value(0.32)).current;
   const nameOpacity = useRef(new Animated.Value(0)).current;
   const nameTranslateY = useRef(new Animated.Value(15)).current;
   const taglineOpacity = useRef(new Animated.Value(0)).current;
@@ -42,10 +42,10 @@ export default function SplashAnimation() {
           duration: Motion.duration.quick,
           useNativeDriver: true,
         }),
-        Animated.timing(signalWidth, {
+        Animated.timing(signalScaleX, {
           toValue: 1,
           duration: Motion.duration.screen,
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
       ]),
     ]).start();
@@ -87,10 +87,7 @@ export default function SplashAnimation() {
             styles.loadingDot,
             {
               opacity: taglineOpacity,
-              width: signalWidth.interpolate({
-                inputRange: [0, 1],
-                outputRange: [28, 88],
-              }),
+              transform: [{ scaleX: signalScaleX }],
             },
           ]}
         />
@@ -145,6 +142,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   loadingDot: {
+    width: 88,
     height: 4,
     borderRadius: 4,
     backgroundColor: Colors.accent,

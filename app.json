@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1a73e8"
+      "backgroundColor": "#F8F8F6"
     },
     "ios": {
       "supportsTablet": true,
@@ -20,7 +20,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#1a73e8"
+        "backgroundColor": "#F8F8F6"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.cabukulas.app"
@@ -33,6 +33,12 @@
       "expo-router",
       "expo-web-browser",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b7575814-170f-47ad-a96e-ace9f3cb5b68"
+      }
+    }
   }
 }

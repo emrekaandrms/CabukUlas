@@ -2,9 +2,18 @@
 
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import CsvExportButton from "@/components/csv-export-button";
+import CsvImportSheet from "@/components/csv-import-sheet";
 import SectionCard from "@/components/section-card";
 import DataTable from "@/components/data-table";
-import { archiveCompany, listCategories, listCompanies, saveCompany } from "@/lib/admin-api";
+import {
+  archiveCompany,
+  exportCompaniesCsvRows,
+  importCompaniesCsv,
+  listCategories,
+  listCompanies,
+  saveCompany,
+} from "@/lib/admin-api";
 import { formatDate, statusLabel } from "@/lib/format";
 import type { CompanyRow } from "@/lib/types";
 
@@ -22,6 +31,26 @@ const EMPTY_COMPANY: Partial<CompanyRow> = {
   is_sponsored: false,
   search_boost: 0,
 };
+
+const COMPANY_IMPORT_COLUMNS = [
+  "id",
+  "slug",
+  "name",
+  "category_id",
+  "category_name",
+  "description",
+  "website_url",
+  "has_cargo_tracking",
+  "cargo_tracking_url",
+  "status",
+  "verification_status",
+  "is_featured",
+  "is_sponsored",
+  "search_boost",
+];
+
+const COMPANY_IMPORT_SAMPLE = `slug,name,category_name,description,website_url,has_cargo_tracking,cargo_tracking_url,status,verification_status,is_featured,is_sponsored,search_boost
+hepsiburada,Hepsiburada,E-Ticaret,Online alışveriş platformu,https://www.hepsiburada.com,false,,published,verified,false,false,10`;
 
 export default function CompaniesPage() {
   const queryClient = useQueryClient();
@@ -58,6 +87,31 @@ export default function CompaniesPage() {
       <SectionCard
         title="Firma yönetimi"
         description="Arama, kategori, verification ve publish akışını tek satırdan yönetin."
+        action={
+          <div className="buttonRow">
+            <CsvExportButton
+              filenamePrefix="companies-export"
+              label="Mevcut veriyi indir"
+              onExport={exportCompaniesCsvRows}
+            />
+            <CsvImportSheet
+              title="Firma CSV import"
+              description="CSV ile firmaları toplu olarak oluştur veya güncelle. Kategori eşlemesi için category_id ya da category_name kullanabilirsin."
+              expectedColumns={COMPANY_IMPORT_COLUMNS}
+              matchRules={[
+                "Güncelleme için önce id, yoksa slug ile eşleşme yapılır.",
+                "Yeni kayıt oluşturmak için en az slug ve name gir.",
+                "category_name verdiğinde sistem kategoriyi isimden çözer.",
+              ]}
+              sampleCsv={COMPANY_IMPORT_SAMPLE}
+              onImport={async (rows) => {
+                const result = await importCompaniesCsv(rows);
+                await queryClient.invalidateQueries({ queryKey: ["admin", "companies"] });
+                return result;
+              }}
+            />
+          </div>
+        }
       >
         <DataTable
           rows={rows}
