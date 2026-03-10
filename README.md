@@ -33,6 +33,30 @@ cp .env.example .env
 
 Supabase Dashboard > Settings > API kismindaki degerleri `.env` dosyasina yapistirir.
 
+### 2.1. Terminalden Supabase Yonetimi
+
+SQL Editor ile ugrasmak istemiyorsaniz, veritabani baglantisini bir kere tanimlayip komutlari terminalden calistirabilirsiniz.
+
+1. Ornek dosyayi kopyalayin:
+
+```bash
+cp .env.supabase.example .env.supabase.local
+```
+
+2. `.env.supabase.local` icine `SUPABASE_DB_URL` degerini yazin.
+3. Sonra asagidaki komutlari kullanin:
+
+```bash
+npm run supabase:ping
+npm run supabase:sql -- "select count(*) from companies;"
+npm run supabase:file -- supabase/migrations/006_operational_foundation.sql
+npm run supabase:apply -- supabase/migrations/006_operational_foundation.sql supabase/migrations/007_admin_analytics_surface.sql
+```
+
+Notlar:
+- Komutlar sirasiyla `.env.supabase.local`, `.env.local`, `.env` dosyalarini yukler.
+- Yikici SQL desenleri algilanirsa komut durur. Bilerek calistirmaniz gerekiyorsa `--force` ekleyin.
+
 ### 3. Uygulamayi Calistir
 
 ```bash

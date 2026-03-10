@@ -9,7 +9,12 @@
     "web": "expo start --web",
     "admin:dev": "npm --prefix admin-web run dev",
     "admin:build": "npm --prefix admin-web run build",
-    "admin:typecheck": "npm --prefix admin-web run typecheck"
+    "admin:typecheck": "npm --prefix admin-web run typecheck",
+    "supabase:ping": "node scripts/supabase-db.js ping",
+    "supabase:sql": "node scripts/supabase-db.js sql",
+    "supabase:file": "node scripts/supabase-db.js file",
+    "supabase:apply": "node scripts/supabase-db.js apply",
+    "supabase:help": "node scripts/supabase-db.js help"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
